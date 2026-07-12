@@ -1,0 +1,19 @@
+{
+  "name": "skyshift",
+  "version": "1.0.0",
+  "description": "An illustrated, dependency-free light and dark mode Web Component",
+  "type": "module",
+  "exports": "./skyshift.js",
+  "files": [
+    "skyshift.js"
+  ],
+  "keywords": [
+    "web-component",
+    "theme",
+    "dark-mode",
+    "light-mode",
+    "accessible",
+    "dependency-free"
+  ],
+  "license": "MIT"
+}
