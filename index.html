@@ -6,6 +6,21 @@
     <meta name="description" content="Skyshift is an illustrated, dependency-free light and dark mode Web Component.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e7bf3e'/%3E%3Cpath d='M0 64V38L64 10v54Z' fill='%23145da0'/%3E%3Ccircle cx='32' cy='30' r='12' fill='white'/%3E%3C/svg%3E">
     <title>Skyshift — illustrated theme switching</title>
+    <script>
+      (() => {
+        let theme;
+        try {
+          const saved = localStorage.getItem('theme-mode');
+          theme = saved === 'light' || saved === 'dark'
+            ? saved
+            : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        } catch {
+          theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
     <style>
       :root {
         color-scheme: light;
@@ -54,6 +69,7 @@
         min-width: 320px;
         scroll-behavior: smooth;
         background: var(--page);
+        transition: background-color 360ms cubic-bezier(.22, .61, .36, 1);
       }
 
       body {
@@ -61,7 +77,54 @@
         margin: 0;
         background: var(--page);
         color: var(--text);
-        transition: background-color 280ms ease, color 280ms ease;
+        transition:
+          background-color 360ms cubic-bezier(.22, .61, .36, 1),
+          color 300ms cubic-bezier(.22, .61, .36, 1);
+      }
+
+      .site-header,
+      .product-frame,
+      .frame-bar,
+      .metrics,
+      .metric,
+      .section,
+      .code-block,
+      .spec-list li,
+      .customizer-panel,
+      .customizer-group,
+      .integration-shell,
+      .integration-bar,
+      .palette-option,
+      .surface-option,
+      .mock-header,
+      .mock-card,
+      .custom-code,
+      .site-footer {
+        transition:
+          background-color 360ms cubic-bezier(.22, .61, .36, 1),
+          border-color 360ms cubic-bezier(.22, .61, .36, 1),
+          color 300ms cubic-bezier(.22, .61, .36, 1),
+          box-shadow 360ms cubic-bezier(.22, .61, .36, 1);
+      }
+
+      .site-nav a,
+      .kicker,
+      h1,
+      h2,
+      h3,
+      p,
+      .frame-bar,
+      .metric strong,
+      .metric span,
+      .section-index,
+      .section-lead,
+      .spec-list strong,
+      .spec-list span,
+      .customizer-label,
+      .mock-nav,
+      .mock-kicker,
+      .site-footer {
+        transition: color 300ms cubic-bezier(.22, .61, .36, 1);
       }
 
       a {
@@ -215,7 +278,11 @@
         text-decoration: none;
         font-size: .86rem;
         font-weight: 700;
-        transition: transform 160ms ease, border-color 160ms ease;
+        transition:
+          transform 160ms ease,
+          border-color 300ms ease,
+          background-color 300ms ease,
+          color 300ms ease;
       }
 
       .button.primary {
@@ -281,6 +348,7 @@
           linear-gradient(90deg, var(--stage-grid) 1px, transparent 1px);
         background-size: 48px 48px;
         clip-path: inset(0);
+        transition: background-color 360ms cubic-bezier(.22, .61, .36, 1);
       }
 
       .demo-content {
@@ -1096,7 +1164,7 @@
                   <div class="mock-nav">
                     <span>Journal</span>
                     <span>Projects</span>
-                    <skyshift-toggle default-theme="light" storage-key="" aria-label="Toggle integration preview theme"></skyshift-toggle>
+                    <skyshift-toggle default-theme="light" storage-key="" no-apply aria-label="Toggle integration preview theme"></skyshift-toggle>
                   </div>
                 </div>
                 <div class="mock-main">

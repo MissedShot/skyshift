@@ -70,6 +70,7 @@ skyshiftTemplate.innerHTML = `
       position: absolute;
       inset: 0;
       overflow: hidden;
+      isolation: isolate;
       border: 1px solid var(--theme-switch-day-border);
       border-radius: 999px;
       background: linear-gradient(135deg,
@@ -78,7 +79,20 @@ skyshiftTemplate.innerHTML = `
       box-shadow:
         inset 0 1px 2px rgba(70, 50, 10, .12),
         0 7px 18px rgba(201, 157, 30, .2);
-      transition: background 280ms ease, border-color 280ms ease, box-shadow 280ms ease;
+      transition: border-color 320ms ease, box-shadow 320ms ease;
+    }
+
+    .track::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg,
+        var(--theme-switch-night-top),
+        var(--theme-switch-night-bottom));
+      opacity: 0;
+      transition: opacity 320ms cubic-bezier(.22, .61, .36, 1);
     }
 
     .control:hover .track {
@@ -94,12 +108,13 @@ skyshiftTemplate.innerHTML = `
 
     input:checked + .track {
       border-color: var(--theme-switch-night-border);
-      background: linear-gradient(135deg,
-        var(--theme-switch-night-top),
-        var(--theme-switch-night-bottom));
       box-shadow:
         inset 0 1px 2px rgba(255, 255, 255, .12),
         0 7px 20px rgba(6, 59, 114, .28);
+    }
+
+    input:checked + .track::before {
+      opacity: 1;
     }
 
     .scene {
@@ -164,6 +179,7 @@ skyshiftTemplate.innerHTML = `
       width: var(--theme-switch-knob-size);
       height: var(--theme-switch-knob-size);
       overflow: hidden;
+      isolation: isolate;
       border-radius: 50%;
       background: radial-gradient(circle at 44% 40%,
         var(--theme-switch-sun-light),
@@ -175,19 +191,36 @@ skyshiftTemplate.innerHTML = `
       transform: translateX(0);
       transition:
         transform 340ms cubic-bezier(.22, .9, .28, 1.16),
-        background 220ms ease,
-        box-shadow 220ms ease;
+        box-shadow 300ms ease;
     }
 
-    input:checked + .track .knob {
+    .knob::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
       background: radial-gradient(circle at 34% 28%,
         var(--theme-switch-moon-light),
         var(--theme-switch-moon-mid) 68%,
         var(--theme-switch-moon-edge));
+      opacity: 0;
+      transform: scale(.94);
+      transition:
+        opacity 260ms cubic-bezier(.22, .61, .36, 1),
+        transform 320ms cubic-bezier(.22, .61, .36, 1);
+    }
+
+    input:checked + .track .knob {
       box-shadow:
         0 2px 10px rgba(5, 36, 68, .3),
         inset 0 0 0 1px rgba(38, 74, 105, .18);
       transform: translateX(var(--theme-switch-travel));
+    }
+
+    input:checked + .track .knob::before {
+      opacity: 1;
+      transform: scale(1);
     }
 
     input:active + .track .knob {
@@ -200,6 +233,7 @@ skyshiftTemplate.innerHTML = `
 
     .moon {
       position: absolute;
+      z-index: 1;
       width: 34px;
       height: 34px;
       opacity: 0;
