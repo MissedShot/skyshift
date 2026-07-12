@@ -336,8 +336,12 @@ class SkyshiftToggle extends HTMLElement {
     this._input = this.shadowRoot.querySelector("input");
     this._reflecting = false;
     this._connected = false;
+    this._initialized = false;
+    this._followsSystem = false;
+    this._systemThemeQuery = null;
 
     this._handleChange = () => {
+      this._stopFollowingSystem();
       this._setTheme(this._input.checked ? "dark" : "light", {
         notify: true,
         persist: true,
@@ -356,6 +360,7 @@ class SkyshiftToggle extends HTMLElement {
         detail.storageKey !== storageKey
       ) return;
 
+      this._stopFollowingSystem();
       this._setTheme(detail.theme, {
         notify: true,
         persist: false,
@@ -375,7 +380,23 @@ class SkyshiftToggle extends HTMLElement {
       }
 
       if (event.newValue !== "light" && event.newValue !== "dark") return;
+      this._stopFollowingSystem();
       this._setTheme(event.newValue, {
+        notify: true,
+        persist: false,
+        reflect: true,
+        synchronize: false
+      });
+    };
+
+    this._handleSystemThemeChange = (event) => {
+      if (!this._followsSystem) return;
+      if (this._readStoredTheme()) {
+        this._stopFollowingSystem();
+        return;
+      }
+
+      this._setTheme(event.matches ? "dark" : "light", {
         notify: true,
         persist: false,
         reflect: true,
@@ -392,7 +413,25 @@ class SkyshiftToggle extends HTMLElement {
     window.addEventListener("storage", this._handleStorage);
 
     this._updateAccessibleName();
-    const initialTheme = this._readInitialTheme();
+    let initialTheme;
+    if (!this._initialized) {
+      initialTheme = this._readInitialTheme();
+      this._initialized = true;
+    } else {
+      const savedTheme = this._readStoredTheme();
+      if (savedTheme) {
+        this._stopFollowingSystem();
+        initialTheme = savedTheme;
+      } else if (this._followsSystem) {
+        initialTheme = this._systemTheme();
+      } else {
+        initialTheme = this.theme;
+      }
+    }
+
+    if (this._followsSystem) {
+      this._getSystemThemeQuery().addEventListener("change", this._handleSystemThemeChange);
+    }
     this._setTheme(initialTheme, {
       notify: false,
       persist: false,
@@ -405,6 +444,7 @@ class SkyshiftToggle extends HTMLElement {
     this._input.removeEventListener("change", this._handleChange);
     window.removeEventListener("skyshift-theme-sync", this._handleSync);
     window.removeEventListener("storage", this._handleStorage);
+    this._systemThemeQuery?.removeEventListener("change", this._handleSystemThemeChange);
     this._connected = false;
   }
 
@@ -418,6 +458,7 @@ class SkyshiftToggle extends HTMLElement {
 
     if (name !== "theme" || this._reflecting || !this._connected) return;
     if (newValue === "light" || newValue === "dark") {
+      this._stopFollowingSystem();
       this._setTheme(newValue, {
         notify: true,
         persist: true,
@@ -435,6 +476,7 @@ class SkyshiftToggle extends HTMLElement {
     if (value !== "light" && value !== "dark") {
       throw new TypeError('theme must be "light" or "dark"');
     }
+    this._stopFollowingSystem();
     this._setTheme(value, {
       notify: true,
       persist: true,
@@ -449,16 +491,40 @@ class SkyshiftToggle extends HTMLElement {
 
   _readInitialTheme() {
     const explicitTheme = this.getAttribute("theme");
-    if (explicitTheme === "light" || explicitTheme === "dark") return explicitTheme;
-
-    const savedTheme = this._readStoredTheme();
-    if (savedTheme) return savedTheme;
-
-    if (this.getAttribute("default-theme") === "system") {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    if (explicitTheme === "light" || explicitTheme === "dark") {
+      this._stopFollowingSystem();
+      return explicitTheme;
     }
 
+    const savedTheme = this._readStoredTheme();
+    if (savedTheme) {
+      this._stopFollowingSystem();
+      return savedTheme;
+    }
+
+    if (this.getAttribute("default-theme") === "system") {
+      this._followsSystem = true;
+      return this._systemTheme();
+    }
+
+    this._stopFollowingSystem();
     return this.getAttribute("default-theme") === "dark" ? "dark" : "light";
+  }
+
+  _getSystemThemeQuery() {
+    if (!this._systemThemeQuery) {
+      this._systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    }
+    return this._systemThemeQuery;
+  }
+
+  _systemTheme() {
+    return this._getSystemThemeQuery().matches ? "dark" : "light";
+  }
+
+  _stopFollowingSystem() {
+    this._followsSystem = false;
+    this._systemThemeQuery?.removeEventListener("change", this._handleSystemThemeChange);
   }
 
   _storageKey() {
@@ -529,7 +595,6 @@ class SkyshiftToggle extends HTMLElement {
       this._reflecting = false;
     }
 
-    const storageKey = this._storageKey();
     if (persist) this._storeTheme(theme);
     this._applyTheme(theme);
 
@@ -541,10 +606,13 @@ class SkyshiftToggle extends HTMLElement {
       }));
     }
 
-    if (synchronize && changed && storageKey && this._theme === theme) {
-      window.dispatchEvent(new CustomEvent("skyshift-theme-sync", {
-        detail: { theme, storageKey, source: this }
-      }));
+    if (synchronize && changed) {
+      const storageKey = this._storageKey();
+      if (storageKey) {
+        window.dispatchEvent(new CustomEvent("skyshift-theme-sync", {
+          detail: { theme, storageKey, source: this }
+        }));
+      }
     }
   }
 }

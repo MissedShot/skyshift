@@ -72,7 +72,7 @@ Open [`index.html`](./index.html) to see a complete responsive demo. It also wor
 | Attribute | Values | Default | Purpose |
 | --- | --- | --- | --- |
 | `theme` | `light`, `dark` | — | Controls the current theme. |
-| `default-theme` | `light`, `dark`, `system` | `light` | Sets the initial fallback when no preference is saved. |
+| `default-theme` | `light`, `dark`, `system` | `light` | Sets the fallback when no preference is saved. `system` follows OS theme changes live. |
 | `storage-key` | Any string | `theme-mode` | Changes the localStorage and synchronization key. An empty value isolates the switch and disables persistence. |
 | `apply-to` | CSS selector | `html` | Selects the element that receives `data-theme`. |
 | `no-apply` | Boolean attribute | Off | Prevents automatic page changes so your app can handle the event itself. |
