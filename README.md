@@ -15,10 +15,10 @@ Skyshift is an illustrated, dependency-free light and dark mode switch built as 
 
 ## Quick start
 
-Copy [`skyshift.js`](./skyshift.js) into your project and load it as an ES module:
+Copy [`skyshift.js`](./skyshift.js) into your project and load it as a deferred script:
 
 ```html
-<script type="module" src="/skyshift.js"></script>
+<script src="/skyshift.js" defer></script>
 
 <skyshift-toggle default-theme="system"></skyshift-toggle>
 ```
@@ -41,7 +41,7 @@ Add the matching website styles:
 }
 ```
 
-Open [`index.html`](./index.html) to see a complete responsive demo.
+Open [`index.html`](./index.html) to see a complete responsive demo. It also works when opened directly from your file browser; a local server is optional.
 
 ## Attributes
 
@@ -165,7 +165,7 @@ import "./skyshift.js";
 
 ## Browser support
 
-Skyshift uses Custom Elements, Shadow DOM, ES modules, CSS custom properties, and `color-scheme`. It targets current versions of Chrome, Edge, Firefox, and Safari.
+Skyshift uses Custom Elements, Shadow DOM, CSS custom properties, and `color-scheme`. It targets current versions of Chrome, Edge, Firefox, and Safari.
 
 ## Development
 

@@ -438,4 +438,4 @@ if (!customElements.get("skyshift-toggle")) {
   customElements.define("skyshift-toggle", SkyshiftToggle);
 }
 
-export { SkyshiftToggle };
+globalThis.SkyshiftToggle = SkyshiftToggle;

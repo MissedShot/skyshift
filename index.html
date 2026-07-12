@@ -4,40 +4,46 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Skyshift is an illustrated, dependency-free light and dark mode Web Component.">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23f4c542'/%3E%3Cpath d='M0 64V36L64 8v56Z' fill='%23145da0'/%3E%3Ccircle cx='32' cy='30' r='13' fill='white'/%3E%3C/svg%3E">
-    <title>Skyshift — a tiny theme switch with a whole sky inside</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e7bf3e'/%3E%3Cpath d='M0 64V38L64 10v54Z' fill='%23145da0'/%3E%3Ccircle cx='32' cy='30' r='12' fill='white'/%3E%3C/svg%3E">
+    <title>Skyshift — illustrated theme switching</title>
     <style>
       :root {
         color-scheme: light;
-        --page: #fffaf0;
-        --surface: rgba(255, 255, 255, .72);
-        --surface-strong: #ffffff;
-        --text: #211b11;
-        --muted: #6d6253;
-        --border: rgba(111, 82, 24, .14);
-        --brand: #d7a51f;
-        --brand-soft: #f7dda0;
-        --shadow: rgba(89, 64, 18, .12);
-        --code: #2a2115;
-        --code-text: #fff7df;
-        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --page: #f3f1eb;
+        --surface: #faf9f5;
+        --surface-raised: #ffffff;
+        --text: #171715;
+        --muted: #6f6d66;
+        --faint: #9b9890;
+        --line: #d9d6cd;
+        --accent: #c89f20;
+        --stage: #e8e4d9;
+        --stage-grid: rgba(35, 34, 30, .07);
+        --code: #191918;
+        --code-text: #f5f2e9;
+        --button-text: #f8f7f2;
+        --shadow: rgba(35, 31, 20, .08);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         background: var(--page);
         color: var(--text);
       }
 
       :root[data-theme="dark"] {
         color-scheme: dark;
-        --page: #071b2f;
-        --surface: rgba(14, 43, 70, .7);
-        --surface-strong: #102f4d;
-        --text: #edf7ff;
-        --muted: #a9c2d7;
-        --border: rgba(160, 205, 240, .16);
-        --brand: #67b7ff;
-        --brand-soft: #174f7f;
-        --shadow: rgba(0, 8, 20, .28);
-        --code: #04111f;
-        --code-text: #dff2ff;
+        --page: #0d1319;
+        --surface: #111a22;
+        --surface-raised: #16222d;
+        --text: #edf1f3;
+        --muted: #a3adb5;
+        --faint: #737f88;
+        --line: #27333d;
+        --accent: #69b7f7;
+        --stage: #091f33;
+        --stage-grid: rgba(189, 220, 244, .08);
+        --code: #060a0e;
+        --code-text: #e9f2f8;
+        --button-text: #101418;
+        --shadow: rgba(0, 0, 0, .22);
       }
 
       * {
@@ -46,443 +52,483 @@
 
       html {
         min-width: 320px;
-        background: var(--page);
         scroll-behavior: smooth;
+        background: var(--page);
       }
 
       body {
         min-height: 100vh;
         margin: 0;
-        overflow-x: hidden;
-        background:
-          radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 32rem),
-          radial-gradient(circle at 88% 34%, color-mix(in srgb, var(--brand-soft) 30%, transparent), transparent 28rem),
-          var(--page);
+        background: var(--page);
         color: var(--text);
-        transition: background 360ms ease, color 300ms ease;
+        transition: background-color 280ms ease, color 280ms ease;
       }
 
       a {
         color: inherit;
       }
 
-      .shell {
-        width: min(1120px, calc(100% - 40px));
-        margin: 0 auto;
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
       }
 
-      header {
+      .shell {
+        width: min(1180px, calc(100% - 48px));
+        margin-inline: auto;
+      }
+
+      .site-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        min-height: 92px;
-        gap: 24px;
+        min-height: 88px;
+        border-bottom: 1px solid var(--line);
       }
 
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 11px;
+        gap: 10px;
         text-decoration: none;
-        font-weight: 750;
-        letter-spacing: -.03em;
+        font-size: .96rem;
+        font-weight: 700;
+        letter-spacing: -.025em;
       }
 
       .brand-mark {
-        width: 34px;
-        height: 34px;
-        display: grid;
-        place-items: center;
-        border-radius: 11px;
-        background: linear-gradient(145deg, #f8d75d 0 48%, #1264a3 52% 100%);
-        box-shadow: 0 8px 20px var(--shadow);
+        position: relative;
+        width: 28px;
+        height: 28px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #e8c23f;
+      }
+
+      .brand-mark::before {
+        content: "";
+        position: absolute;
+        inset: 12px -5px -5px 4px;
+        background: #145d96;
+        transform: rotate(-24deg);
       }
 
       .brand-mark::after {
         content: "";
-        width: 12px;
-        height: 12px;
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        top: 8px;
+        left: 9px;
         border-radius: 50%;
         background: #fff;
-        box-shadow: 5px 3px 0 -2px #c9d8e5;
       }
 
-      .header-actions {
+      .site-nav {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 24px;
       }
 
-      .github-link {
+      .site-nav a {
         color: var(--muted);
         text-decoration: none;
-        font-size: .94rem;
-        font-weight: 650;
+        font-size: .84rem;
+        font-weight: 600;
       }
 
-      .github-link:hover {
+      .site-nav a:hover {
         color: var(--text);
       }
 
-      .header-actions skyshift-toggle {
-        scale: .72;
+      .site-nav skyshift-toggle {
+        scale: .64;
         transform-origin: right center;
-        margin-left: -28px;
+        margin-left: -32px;
       }
 
       main {
-        padding: 70px 0 96px;
+        padding-block: 96px 120px;
       }
 
       .hero {
         display: grid;
-        grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr);
-        align-items: center;
-        gap: clamp(44px, 8vw, 100px);
+        grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr);
+        align-items: end;
+        gap: clamp(48px, 9vw, 116px);
       }
 
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin: 0 0 20px;
-        color: var(--brand);
-        font-size: .78rem;
-        font-weight: 800;
+      .kicker {
+        margin: 0 0 22px;
+        color: var(--accent);
+        font: 700 .72rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
         letter-spacing: .12em;
         text-transform: uppercase;
       }
 
-      .eyebrow::before {
-        content: "";
-        width: 22px;
-        height: 2px;
-        border-radius: 999px;
-        background: currentColor;
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
       }
 
       h1 {
-        max-width: 720px;
-        margin: 0;
-        font-size: clamp(3.2rem, 7vw, 6.7rem);
-        line-height: .94;
-        letter-spacing: -.075em;
+        max-width: 820px;
+        margin-bottom: 0;
+        font-size: clamp(3.7rem, 7.6vw, 7.2rem);
+        font-weight: 600;
+        line-height: .96;
+        letter-spacing: -.072em;
       }
 
-      h1 span {
-        color: var(--brand);
+      .hero-aside {
+        padding-bottom: 6px;
       }
 
-      .lead {
-        max-width: 610px;
-        margin: 28px 0 0;
+      .hero-aside p {
+        margin-bottom: 28px;
         color: var(--muted);
-        font-size: clamp(1.06rem, 2vw, 1.24rem);
-        line-height: 1.7;
+        font-size: 1.04rem;
+        line-height: 1.65;
       }
 
-      .hero-actions {
+      .action-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 34px;
+        gap: 10px;
       }
 
       .button {
+        min-height: 44px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 48px;
-        padding: 0 20px;
-        border: 1px solid var(--border);
-        border-radius: 14px;
+        padding-inline: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
         background: var(--surface);
         color: var(--text);
         text-decoration: none;
-        font-weight: 720;
-        box-shadow: 0 12px 30px var(--shadow);
-        backdrop-filter: blur(16px);
+        font-size: .86rem;
+        font-weight: 700;
+        transition: transform 160ms ease, border-color 160ms ease;
       }
 
       .button.primary {
-        border-color: transparent;
+        border-color: var(--text);
         background: var(--text);
-        color: var(--page);
+        color: var(--button-text);
       }
 
       .button:hover {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
+        border-color: var(--text);
       }
 
-      .showcase {
+      .product-frame {
+        margin-top: 82px;
+        overflow: clip;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--surface);
+        box-shadow: 0 24px 70px var(--shadow);
+        clip-path: inset(0 round 24px);
+        contain: paint;
+        isolation: isolate;
+      }
+
+      .frame-bar {
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding-inline: 20px;
+        border-bottom: 1px solid var(--line);
+        color: var(--faint);
+        font: 600 .68rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      .frame-state {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .frame-state::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      .demo-stage {
         position: relative;
-        min-height: 430px;
+        min-height: 480px;
         display: grid;
         place-items: center;
-        overflow: hidden;
-        border: 1px solid var(--border);
-        border-radius: 36px;
-        background:
-          linear-gradient(145deg, color-mix(in srgb, var(--surface-strong) 84%, transparent), var(--surface));
-        box-shadow: 0 30px 90px var(--shadow);
-        backdrop-filter: blur(24px);
+        overflow: clip;
+        background-color: var(--stage);
+        background-image:
+          linear-gradient(var(--stage-grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--stage-grid) 1px, transparent 1px);
+        background-size: 48px 48px;
+        clip-path: inset(0);
       }
 
-      .showcase::before,
-      .showcase::after {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(2px);
-      }
-
-      .showcase::before {
-        width: 230px;
-        height: 230px;
-        top: -80px;
-        right: -50px;
-        background: color-mix(in srgb, var(--brand) 24%, transparent);
-      }
-
-      .showcase::after {
-        width: 170px;
-        height: 170px;
-        bottom: -60px;
-        left: -30px;
-        background: color-mix(in srgb, var(--brand-soft) 36%, transparent);
-      }
-
-      .showcase-content {
-        position: relative;
-        z-index: 1;
+      .demo-content {
         display: grid;
         justify-items: center;
-        gap: 26px;
+        gap: 42px;
+        padding: 60px 24px;
       }
 
-      .showcase skyshift-toggle {
-        scale: 1.45;
+      .demo-content skyshift-toggle {
+        scale: 1.65;
       }
 
-      .mode-copy {
+      .demo-caption {
         display: grid;
         justify-items: center;
         gap: 7px;
-        margin-top: 12px;
+        text-align: center;
       }
 
-      .mode-copy strong {
-        font-size: 1.05rem;
+      .demo-caption strong {
+        font-size: .92rem;
+        letter-spacing: -.01em;
       }
 
-      .mode-copy span {
+      .demo-caption span {
         color: var(--muted);
-        font-size: .9rem;
+        font-size: .78rem;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--line);
+      }
+
+      .metric {
+        min-height: 104px;
+        display: grid;
+        align-content: center;
+        gap: 7px;
+        padding: 20px;
+      }
+
+      .metric + .metric {
+        border-left: 1px solid var(--line);
+      }
+
+      .metric strong {
+        font-size: 1rem;
+        font-weight: 650;
+      }
+
+      .metric span {
+        color: var(--faint);
+        font: 600 .66rem/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .08em;
+        text-transform: uppercase;
       }
 
       .section {
-        margin-top: 120px;
+        display: grid;
+        grid-template-columns: minmax(220px, .55fr) minmax(0, 1.45fr);
+        gap: clamp(48px, 9vw, 120px);
+        margin-top: 140px;
+        padding-top: 32px;
+        border-top: 1px solid var(--line);
       }
 
-      .section-heading {
-        max-width: 700px;
-        margin-bottom: 34px;
+      .section > * {
+        min-width: 0;
+      }
+
+      .section-index {
+        color: var(--faint);
+        font: 600 .7rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .08em;
+        text-transform: uppercase;
       }
 
       h2 {
-        margin: 0;
-        font-size: clamp(2rem, 4.5vw, 3.6rem);
-        line-height: 1.06;
+        max-width: 720px;
+        margin-bottom: 18px;
+        font-size: clamp(2.3rem, 5vw, 4.6rem);
+        font-weight: 600;
+        line-height: 1.02;
         letter-spacing: -.055em;
       }
 
-      .section-heading p {
-        margin: 16px 0 0;
+      .section-lead {
+        max-width: 650px;
+        margin-bottom: 42px;
         color: var(--muted);
         line-height: 1.7;
       }
 
-      .install-grid {
-        display: grid;
-        grid-template-columns: 1.15fr .85fr;
-        gap: 20px;
-      }
-
-      .code-card,
-      .info-card {
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        box-shadow: 0 20px 54px var(--shadow);
-      }
-
-      .code-card {
+      .code-block {
+        max-width: 100%;
         overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 12px;
         background: var(--code);
         color: var(--code-text);
       }
 
-      .code-bar {
+      .code-label {
+        min-height: 42px;
         display: flex;
         align-items: center;
-        gap: 7px;
-        padding: 15px 18px;
+        padding-inline: 17px;
         border-bottom: 1px solid rgba(255, 255, 255, .1);
+        color: rgba(255, 255, 255, .5);
+        font: 600 .64rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: .09em;
+        text-transform: uppercase;
       }
-
-      .code-bar i {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #f4c542;
-      }
-
-      .code-bar i:nth-child(2) { opacity: .62; }
-      .code-bar i:nth-child(3) { opacity: .32; }
 
       pre {
         margin: 0;
-        padding: 26px;
+        padding: 24px;
         overflow-x: auto;
-        font: 500 .9rem/1.8 ui-monospace, SFMono-Regular, Menlo, monospace;
+        font: 500 .86rem/1.85 ui-monospace, SFMono-Regular, Menlo, monospace;
       }
 
-      .token-tag { color: #86d3ff; }
-      .token-attr { color: #f7d977; }
-      .token-string { color: #b6e59e; }
+      .token-tag { color: #8bd4ff; }
+      .token-attr { color: #e6ca74; }
+      .token-string { color: #acd898; }
 
-      .info-card {
-        padding: 28px;
-        background: var(--surface);
-        backdrop-filter: blur(18px);
-      }
-
-      .info-card h3 {
-        margin: 0 0 10px;
-        font-size: 1.15rem;
-      }
-
-      .info-card p {
+      .spec-list {
         margin: 0;
-        color: var(--muted);
-        line-height: 1.65;
-      }
-
-      .info-card ul {
-        display: grid;
-        gap: 13px;
-        margin: 24px 0 0;
         padding: 0;
         list-style: none;
+        border-top: 1px solid var(--line);
       }
 
-      .info-card li {
-        display: flex;
-        gap: 10px;
-        align-items: baseline;
-      }
-
-      .info-card li::before {
-        content: "✓";
-        color: var(--brand);
-        font-weight: 900;
-      }
-
-      .features {
+      .spec-list li {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
+        grid-template-columns: 170px 1fr;
+        gap: 24px;
+        padding-block: 22px;
+        border-bottom: 1px solid var(--line);
       }
 
-      .feature {
-        min-height: 180px;
-        padding: 24px;
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: var(--surface);
-        backdrop-filter: blur(16px);
+      .spec-list strong {
+        font-size: .86rem;
       }
 
-      .feature-number {
-        color: var(--brand);
-        font: 700 .8rem/1 ui-monospace, monospace;
-      }
-
-      .feature h3 {
-        margin: 48px 0 8px;
-        font-size: 1.08rem;
-      }
-
-      .feature p {
-        margin: 0;
+      .spec-list span {
         color: var(--muted);
-        font-size: .94rem;
+        font-size: .92rem;
         line-height: 1.6;
       }
 
-      footer {
+      .site-footer {
         display: flex;
         justify-content: space-between;
-        gap: 20px;
-        padding: 34px 0 46px;
-        border-top: 1px solid var(--border);
-        color: var(--muted);
-        font-size: .9rem;
+        gap: 24px;
+        padding-block: 34px 44px;
+        border-top: 1px solid var(--line);
+        color: var(--faint);
+        font-size: .76rem;
       }
 
       @media (max-width: 840px) {
         main {
-          padding-top: 40px;
+          padding-top: 72px;
         }
 
         .hero,
-        .install-grid {
+        .section {
           grid-template-columns: 1fr;
         }
 
-        .showcase {
-          min-height: 360px;
+        .hero {
+          gap: 36px;
         }
 
-        .features {
-          grid-template-columns: 1fr;
+        .hero-aside {
+          max-width: 560px;
         }
 
-        .feature {
-          min-height: 0;
+        .product-frame {
+          margin-top: 64px;
         }
 
-        .feature h3 {
-          margin-top: 26px;
+        .section {
+          gap: 24px;
+          margin-top: 104px;
         }
       }
 
-      @media (max-width: 560px) {
+      @media (max-width: 600px) {
         .shell {
-          width: min(100% - 28px, 1120px);
+          width: min(100% - 28px, 1180px);
         }
 
-        header {
-          min-height: 76px;
+        .site-header {
+          min-height: 72px;
         }
 
-        .github-link {
+        .site-nav a {
           display: none;
         }
 
         h1 {
-          font-size: clamp(3.25rem, 18vw, 5rem);
+          font-size: clamp(3.35rem, 17vw, 5rem);
         }
 
-        .showcase {
-          min-height: 320px;
-          border-radius: 28px;
+        .product-frame {
+          border-radius: 16px;
+          clip-path: inset(0 round 16px);
         }
 
-        .section {
-          margin-top: 82px;
+        .frame-bar {
+          padding-inline: 14px;
         }
 
-        footer {
+        .frame-bar span:first-child {
+          display: none;
+        }
+
+        .demo-stage {
+          min-height: 360px;
+          background-size: 36px 36px;
+        }
+
+        .demo-content skyshift-toggle {
+          scale: 1.35;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .metric:nth-child(3) {
+          border-left: 0;
+        }
+
+        .metric:nth-child(n + 3) {
+          border-top: 1px solid var(--line);
+        }
+
+        .spec-list li {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        .site-footer {
           flex-direction: column;
         }
       }
@@ -494,102 +540,91 @@
         }
       }
     </style>
-    <script type="module" src="./skyshift.js"></script>
+    <script src="./skyshift.js" defer></script>
   </head>
   <body>
-    <header class="shell">
+    <header class="site-header shell">
       <a class="brand" href="#top" aria-label="Skyshift home">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>Skyshift</span>
       </a>
-      <div class="header-actions">
-        <a class="github-link" href="https://github.com/MissedShot/skyshift">GitHub</a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#install">Install</a>
+        <a href="#details">Details</a>
+        <a href="https://github.com/MissedShot/skyshift">GitHub</a>
         <skyshift-toggle default-theme="system" aria-label="Change website theme"></skyshift-toggle>
-      </div>
+      </nav>
     </header>
 
     <main id="top" class="shell">
       <section class="hero" aria-labelledby="hero-title">
         <div>
-          <p class="eyebrow">Dependency-free Web Component</p>
-          <h1 id="hero-title">A tiny switch with a <span>whole sky</span> inside.</h1>
-          <p class="lead">Skyshift brings an illustrated day-and-night theme toggle to any website—without dependencies, style collisions, or setup headaches.</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#install">Get started</a>
-            <a class="button" href="https://github.com/MissedShot/skyshift">View source</a>
+          <p class="kicker">Open-source interface component</p>
+          <h1 id="hero-title">Day and night, thoughtfully switched.</h1>
+        </div>
+        <div class="hero-aside">
+          <p>An illustrated theme control built as one portable Web Component. No dependencies, no inherited style problems, no setup ceremony.</p>
+          <div class="action-row">
+            <a class="button primary" href="#install">Install Skyshift</a>
+            <a class="button" href="https://github.com/MissedShot/skyshift">Source</a>
           </div>
         </div>
+      </section>
 
-        <div class="showcase" aria-label="Interactive Skyshift preview">
-          <div class="showcase-content">
+      <section class="product-frame" aria-label="Interactive Skyshift demonstration">
+        <div class="frame-bar">
+          <span>Component preview · 01</span>
+          <span class="frame-state">Interactive</span>
+        </div>
+        <div class="demo-stage">
+          <div class="demo-content">
             <skyshift-toggle default-theme="system" aria-label="Preview theme switch"></skyshift-toggle>
-            <div class="mode-copy" aria-live="polite">
-              <strong>Shift the atmosphere</strong>
-              <span>Try the switch</span>
+            <div class="demo-caption" aria-live="polite">
+              <strong>Change the atmosphere</strong>
+              <span>Use the switch to preview both states</span>
             </div>
           </div>
+        </div>
+        <div class="metrics" aria-label="Skyshift facts">
+          <div class="metric"><strong>≈ 13 KB</strong><span>Source size</span></div>
+          <div class="metric"><strong>Zero</strong><span>Dependencies</span></div>
+          <div class="metric"><strong>Native</strong><span>Input semantics</span></div>
+          <div class="metric"><strong>Shadow DOM</strong><span>Style isolation</span></div>
         </div>
       </section>
 
       <section id="install" class="section" aria-labelledby="install-title">
-        <div class="section-heading">
-          <p class="eyebrow">Two lines to install</p>
-          <h2 id="install-title">Drop it in. Let the sky do the rest.</h2>
-          <p>Copy the module, add the custom element, and style your page with the resulting <code>data-theme</code> attribute.</p>
-        </div>
+        <div class="section-index">01 · Installation</div>
+        <div>
+          <h2 id="install-title">One file. Two lines.</h2>
+          <p class="section-lead">Copy the script into your project and place the custom element wherever the theme control belongs. Skyshift updates <code>data-theme</code> and remembers the visitor's choice.</p>
+          <div class="code-block" aria-label="Skyshift installation code">
+            <div class="code-label">HTML</div>
+            <pre><code><span class="token-tag">&lt;script</span> <span class="token-attr">src</span>=<span class="token-string">"/skyshift.js"</span> <span class="token-attr">defer</span><span class="token-tag">&gt;&lt;/script&gt;</span>
 
-        <div class="install-grid">
-          <div class="code-card" aria-label="Skyshift installation code">
-            <div class="code-bar" aria-hidden="true"><i></i><i></i><i></i></div>
-            <pre><code><span class="token-tag">&lt;script</span> <span class="token-attr">type</span>=<span class="token-string">"module"</span>
-  <span class="token-attr">src</span>=<span class="token-string">"/skyshift.js"</span><span class="token-tag">&gt;&lt;/script&gt;</span>
-
-<span class="token-tag">&lt;skyshift-toggle</span>
-  <span class="token-attr">default-theme</span>=<span class="token-string">"system"</span>
-<span class="token-tag">&gt;&lt;/skyshift-toggle&gt;</span></code></pre>
+<span class="token-tag">&lt;skyshift-toggle</span> <span class="token-attr">default-theme</span>=<span class="token-string">"system"</span><span class="token-tag">&gt;&lt;/skyshift-toggle&gt;</span></code></pre>
           </div>
-
-          <aside class="info-card">
-            <h3>Portable by default</h3>
-            <p>Shadow DOM keeps the illustration protected from whatever CSS your website already uses.</p>
-            <ul>
-              <li>No runtime dependencies</li>
-              <li>Saved theme preference</li>
-              <li>Keyboard and screen-reader friendly</li>
-              <li>Customizable with CSS variables</li>
-            </ul>
-          </aside>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="features-title">
-        <div class="section-heading">
-          <p class="eyebrow">Small file, thoughtful details</p>
-          <h2 id="features-title">Built to travel between projects.</h2>
-        </div>
-        <div class="features">
-          <article class="feature">
-            <span class="feature-number">01</span>
-            <h3>Framework agnostic</h3>
-            <p>Use the same custom element in plain HTML, React, Vue, Svelte, Astro, or anywhere modern JavaScript runs.</p>
-          </article>
-          <article class="feature">
-            <span class="feature-number">02</span>
-            <h3>Accessible interaction</h3>
-            <p>A native checkbox powers the switch, with focus visibility, dynamic labels, and reduced-motion support.</p>
-          </article>
-          <article class="feature">
-            <span class="feature-number">03</span>
-            <h3>Your colors, your sky</h3>
-            <p>Override documented CSS variables to make the day, night, clouds, moon, and focus ring fit your brand.</p>
-          </article>
+      <section id="details" class="section" aria-labelledby="details-title">
+        <div class="section-index">02 · Details</div>
+        <div>
+          <h2 id="details-title">Designed for real interfaces.</h2>
+          <p class="section-lead">The illustration is expressive; the implementation stays deliberately ordinary and dependable.</p>
+          <ul class="spec-list">
+            <li><strong>Portable</strong><span>Works in plain HTML and modern frameworks through the standard Custom Elements API.</span></li>
+            <li><strong>Accessible</strong><span>Uses a native checkbox with switch semantics, visible focus, dynamic labels, and reduced-motion support.</span></li>
+            <li><strong>Persistent</strong><span>Stores the chosen theme locally and synchronizes multiple Skyshift instances on the same page.</span></li>
+            <li><strong>Customizable</strong><span>Exposes focused CSS variables for size, day, night, clouds, sun, moon, and focus styling.</span></li>
+          </ul>
         </div>
       </section>
     </main>
 
-    <footer class="shell">
-      <span>Skyshift · MIT licensed</span>
-      <span>Made for websites that deserve a little atmosphere.</span>
+    <footer class="site-footer shell">
+      <span>Skyshift · MIT License · 2026</span>
+      <span>Built by MissedShot</span>
     </footer>
   </body>
 </html>
