@@ -28,10 +28,10 @@
         --surface: #faf9f5;
         --surface-raised: #ffffff;
         --text: #171715;
-        --muted: #6f6d66;
-        --faint: #9b9890;
+        --muted: #5f5d57;
+        --faint: #716e66;
         --line: #d9d6cd;
-        --accent: #c89f20;
+        --accent: #806718;
         --stage: #e8e4d9;
         --stage-grid: rgba(35, 34, 30, .07);
         --code: #191918;
@@ -50,7 +50,7 @@
         --surface-raised: #16222d;
         --text: #edf1f3;
         --muted: #a3adb5;
-        --faint: #737f88;
+        --faint: #7d8992;
         --line: #27333d;
         --accent: #69b7f7;
         --stage: #091f33;
@@ -131,11 +131,25 @@
         color: inherit;
       }
 
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
       button,
       input,
       select,
       textarea {
         font: inherit;
+      }
+
+      skyshift-toggle:not(:defined) {
+        display: inline-block;
+        width: 112px;
+        height: 56px;
+        visibility: hidden;
+        vertical-align: middle;
       }
 
       .shell {
@@ -636,7 +650,7 @@
         --preview-light-bg: #f0ede5;
         --preview-light-surface: #fbfaf7;
         --preview-light-text: #1d1d1a;
-        --preview-light-muted: #77736a;
+        --preview-light-muted: #68645b;
         --preview-dark-bg: #10171e;
         --preview-dark-surface: #17232d;
         --preview-dark-text: #f1f5f7;
@@ -646,19 +660,7 @@
         --preview-surface: var(--preview-light-surface);
         --preview-text: var(--preview-light-text);
         --preview-muted: var(--preview-light-muted);
-
-        --theme-switch-day-top: #f6df86;
-        --theme-switch-day-bottom: #fff2c2;
-        --theme-switch-day-border: #e4bd45;
-        --theme-switch-sun-light: #f9d85a;
-        --theme-switch-sun-mid: #f4c542;
-        --theme-switch-sun-edge: #d9aa20;
-        --theme-switch-night-top: #145da0;
-        --theme-switch-night-bottom: #063b72;
-        --theme-switch-night-border: #1683dc;
-        --theme-switch-night-cloud-far: #4b86bf;
-        --theme-switch-night-cloud-mid: #619bd2;
-        --theme-switch-night-cloud-front: #79afe0;
+        --preview-accent: #145da0;
 
         min-height: 470px;
         background: var(--preview-bg);
@@ -688,48 +690,15 @@
       }
 
       .integration-page[data-palette="sage"] {
-        --theme-switch-day-top: #cfe3c5;
-        --theme-switch-day-bottom: #edf4df;
-        --theme-switch-day-border: #9fbd91;
-        --theme-switch-sun-light: #e8d882;
-        --theme-switch-sun-mid: #d8c668;
-        --theme-switch-sun-edge: #ac9941;
-        --theme-switch-night-top: #315c55;
-        --theme-switch-night-bottom: #193b37;
-        --theme-switch-night-border: #4d8178;
-        --theme-switch-night-cloud-far: #50786f;
-        --theme-switch-night-cloud-mid: #6d958b;
-        --theme-switch-night-cloud-front: #8dafaa;
+        --preview-accent: #315c55;
       }
 
       .integration-page[data-palette="violet"] {
-        --theme-switch-day-top: #dfd2f4;
-        --theme-switch-day-bottom: #f3ecff;
-        --theme-switch-day-border: #b89adf;
-        --theme-switch-sun-light: #ffd67d;
-        --theme-switch-sun-mid: #f1bc52;
-        --theme-switch-sun-edge: #c88d2d;
-        --theme-switch-night-top: #564080;
-        --theme-switch-night-bottom: #2d214f;
-        --theme-switch-night-border: #7b62aa;
-        --theme-switch-night-cloud-far: #65548a;
-        --theme-switch-night-cloud-mid: #7f6da4;
-        --theme-switch-night-cloud-front: #9d8cbe;
+        --preview-accent: #564080;
       }
 
       .integration-page[data-palette="mono"] {
-        --theme-switch-day-top: #dadad5;
-        --theme-switch-day-bottom: #f4f4ef;
-        --theme-switch-day-border: #aaa9a1;
-        --theme-switch-sun-light: #d9d7ce;
-        --theme-switch-sun-mid: #b9b7ae;
-        --theme-switch-sun-edge: #929087;
-        --theme-switch-night-top: #42484d;
-        --theme-switch-night-bottom: #24292d;
-        --theme-switch-night-border: #686f74;
-        --theme-switch-night-cloud-far: #5e666c;
-        --theme-switch-night-cloud-mid: #747d83;
-        --theme-switch-night-cloud-front: #939ba0;
+        --preview-accent: #42484d;
       }
 
       .integration-page skyshift-toggle {
@@ -815,7 +784,7 @@
         width: 20px;
         height: 20px;
         border-radius: 6px;
-        background: var(--theme-switch-night-top);
+        background: var(--preview-accent);
       }
 
       .mock-nav {
@@ -901,6 +870,22 @@
         border-top: 1px solid var(--line);
         color: var(--faint);
         font-size: .76rem;
+      }
+
+      @media (max-width: 1080px) {
+        .customizer {
+          grid-template-columns: 1fr;
+        }
+
+        .customizer-panel {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .customizer-group + .customizer-group {
+          border-top: 0;
+          border-left: 1px solid var(--line);
+        }
       }
 
       @media (max-width: 840px) {
@@ -1044,7 +1029,7 @@
         <a href="#details">Details</a>
         <a href="#customize">Customize</a>
         <a href="https://github.com/MissedShot/skyshift">GitHub</a>
-        <skyshift-toggle default-theme="system" aria-label="Change website theme"></skyshift-toggle>
+        <skyshift-toggle default-theme="system" label="Website theme"></skyshift-toggle>
       </nav>
     </header>
 
@@ -1070,18 +1055,18 @@
         </div>
         <div class="demo-stage">
           <div class="demo-content">
-            <skyshift-toggle default-theme="system" aria-label="Preview theme switch"></skyshift-toggle>
-            <div class="demo-caption" aria-live="polite">
+            <skyshift-toggle default-theme="system" label="Preview theme"></skyshift-toggle>
+            <div class="demo-caption">
               <strong>Change the atmosphere</strong>
               <span>Use the switch to preview both states</span>
             </div>
           </div>
         </div>
-        <div class="metrics" aria-label="Skyshift facts">
-          <div class="metric"><strong>≈ 13 KB</strong><span>Source size</span></div>
-          <div class="metric"><strong>Zero</strong><span>Dependencies</span></div>
-          <div class="metric"><strong>Native</strong><span>Input semantics</span></div>
-          <div class="metric"><strong>Shadow DOM</strong><span>Style isolation</span></div>
+        <div class="metrics" role="list" aria-label="Skyshift facts">
+          <div class="metric" role="listitem"><strong>≈ 16 KB</strong><span>Source size</span></div>
+          <div class="metric" role="listitem"><strong>Zero</strong><span>Dependencies</span></div>
+          <div class="metric" role="listitem"><strong>Native</strong><span>Input semantics</span></div>
+          <div class="metric" role="listitem"><strong>Shadow DOM</strong><span>Style isolation</span></div>
         </div>
       </section>
 
@@ -1090,9 +1075,9 @@
         <div>
           <h2 id="install-title">One file. Two lines.</h2>
           <p class="section-lead">Copy the script into your project and place the custom element wherever the theme control belongs. Skyshift updates <code>data-theme</code> and remembers the visitor's choice.</p>
-          <div class="code-block" aria-label="Skyshift installation code">
+          <div class="code-block">
             <div class="code-label">HTML</div>
-            <pre><code><span class="token-tag">&lt;script</span> <span class="token-attr">src</span>=<span class="token-string">"/skyshift.js"</span> <span class="token-attr">defer</span><span class="token-tag">&gt;&lt;/script&gt;</span>
+            <pre><code><span class="token-tag">&lt;script</span> <span class="token-attr">src</span>=<span class="token-string">"./skyshift.js"</span> <span class="token-attr">defer</span><span class="token-tag">&gt;&lt;/script&gt;</span>
 
 <span class="token-tag">&lt;skyshift-toggle</span> <span class="token-attr">default-theme</span>=<span class="token-string">"system"</span><span class="token-tag">&gt;&lt;/skyshift-toggle&gt;</span></code></pre>
           </div>
@@ -1106,8 +1091,8 @@
           <p class="section-lead">The illustration is expressive; the implementation stays deliberately ordinary and dependable.</p>
           <ul class="spec-list">
             <li><strong>Portable</strong><span>Works in plain HTML and modern frameworks through the standard Custom Elements API.</span></li>
-            <li><strong>Accessible</strong><span>Uses a native checkbox with switch semantics, visible focus, dynamic labels, and reduced-motion support.</span></li>
-            <li><strong>Persistent</strong><span>Stores the chosen theme locally and synchronizes multiple Skyshift instances on the same page.</span></li>
+            <li><strong>Accessible</strong><span>Uses a native checkbox with switch semantics, a stable accessible name, visible focus, and reduced-motion support.</span></li>
+            <li><strong>Persistent</strong><span>Stores the chosen theme locally and synchronizes Skyshift instances that share a storage key.</span></li>
             <li><strong>Customizable</strong><span>Exposes focused CSS variables for size, day, night, clouds, sun, moon, and focus styling.</span></li>
           </ul>
         </div>
@@ -1117,12 +1102,12 @@
         <div class="section-index">03 · Customize</div>
         <div>
           <h2 id="customize-title">Make it belong.</h2>
-          <p class="section-lead">Try curated palettes and page surfaces, then use the generated variables as a starting point. The preview shows Skyshift in a real navigation context—not floating on a component canvas.</p>
+          <p class="section-lead">Try curated palettes and page surfaces, then use the generated two-color override as a starting point. The preview shows Skyshift in a real navigation context—not floating on a component canvas.</p>
 
           <div class="customizer" data-customizer>
-            <div class="customizer-panel" aria-label="Customization controls">
-              <div class="customizer-group">
-                <span class="customizer-label">Palette</span>
+            <div class="customizer-panel">
+              <div class="customizer-group" role="group" aria-labelledby="palette-label">
+                <span id="palette-label" class="customizer-label">Palette</span>
                 <div class="palette-options">
                   <button class="palette-option" type="button" data-palette-value="original" aria-pressed="true">
                     <span>Original</span>
@@ -1143,8 +1128,8 @@
                 </div>
               </div>
 
-              <div class="customizer-group">
-                <span class="customizer-label">Page surface</span>
+              <div class="customizer-group" role="group" aria-labelledby="surface-label">
+                <span id="surface-label" class="customizer-label">Page surface</span>
                 <div class="surface-options">
                   <button class="surface-option" type="button" data-surface-value="sand" aria-pressed="true">Sand</button>
                   <button class="surface-option" type="button" data-surface-value="paper" aria-pressed="false">Paper</button>
@@ -1164,7 +1149,7 @@
                   <div class="mock-nav">
                     <span>Journal</span>
                     <span>Projects</span>
-                    <skyshift-toggle default-theme="light" storage-key="" no-apply aria-label="Toggle integration preview theme"></skyshift-toggle>
+                    <skyshift-toggle default-theme="light" storage-key="" no-apply label="Integration preview theme"></skyshift-toggle>
                   </div>
                 </div>
                 <div class="mock-main">

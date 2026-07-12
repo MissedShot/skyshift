@@ -1,3 +1,17 @@
+(() => {
+if (
+  typeof window === "undefined" ||
+  typeof document === "undefined" ||
+  typeof HTMLElement === "undefined" ||
+  typeof customElements === "undefined"
+) return;
+
+const registeredToggle = customElements.get("skyshift-toggle");
+if (registeredToggle) {
+  globalThis.SkyshiftToggle = registeredToggle;
+  return;
+}
+
 const skyshiftTemplate = document.createElement("template");
 
 skyshiftTemplate.innerHTML = `
@@ -7,7 +21,12 @@ skyshiftTemplate.innerHTML = `
       --theme-switch-height: 56px;
       --theme-switch-knob-size: 44px;
       --theme-switch-inset: 5px;
-      --theme-switch-travel: 56px;
+      --theme-switch-travel: calc(
+        var(--theme-switch-width) -
+        var(--theme-switch-knob-size) -
+        var(--theme-switch-inset) -
+        var(--theme-switch-inset)
+      );
 
       --theme-switch-day-top: #f6df86;
       --theme-switch-day-bottom: #fff2c2;
@@ -34,6 +53,7 @@ skyshiftTemplate.innerHTML = `
       --theme-switch-moon-edge: #c9d8e5;
       --theme-switch-moon-detail: #7392ad;
       --theme-switch-focus: #2684ff;
+      --theme-switch-hover-ring: rgba(38, 132, 255, .16);
 
       display: inline-block;
       width: var(--theme-switch-width);
@@ -98,7 +118,8 @@ skyshiftTemplate.innerHTML = `
     .control:hover .track {
       box-shadow:
         inset 0 1px 2px rgba(70, 50, 10, .12),
-        0 0 0 4px rgba(38, 132, 255, .16);
+        0 7px 18px rgba(201, 157, 30, .2),
+        0 0 0 4px var(--theme-switch-hover-ring);
     }
 
     input:focus-visible + .track {
@@ -111,6 +132,13 @@ skyshiftTemplate.innerHTML = `
       box-shadow:
         inset 0 1px 2px rgba(255, 255, 255, .12),
         0 7px 20px rgba(6, 59, 114, .28);
+    }
+
+    .control:hover input:checked + .track {
+      box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, .12),
+        0 7px 20px rgba(6, 59, 114, .28),
+        0 0 0 4px var(--theme-switch-hover-ring);
     }
 
     input:checked + .track::before {
@@ -265,7 +293,7 @@ skyshiftTemplate.innerHTML = `
   </style>
 
   <label class="control">
-    <input type="checkbox" role="switch" aria-label="Switch to dark mode">
+    <input type="checkbox" role="switch" aria-label="Dark mode">
     <span class="track" aria-hidden="true">
       <svg class="scene day-scene" viewBox="0 0 112 56" preserveAspectRatio="none">
         <path class="far" d="M34 60V49c3-5 7-7 12-6 2-6 7-10 13-10 5 0 9 3 11 7 3-7 8-11 15-11 8 0 13 5 15 12 8-1 14 5 16 12v7Z"></path>
@@ -299,7 +327,7 @@ skyshiftTemplate.innerHTML = `
 `;
 
 class SkyshiftToggle extends HTMLElement {
-  static observedAttributes = ["theme"];
+  static observedAttributes = ["theme", "label", "aria-label"];
 
   constructor() {
     super();
@@ -311,28 +339,47 @@ class SkyshiftToggle extends HTMLElement {
 
     this._handleChange = () => {
       this._setTheme(this._input.checked ? "dark" : "light", {
-        emit: true,
+        notify: true,
         persist: true,
-        reflect: true
+        reflect: true,
+        synchronize: true
       });
     };
 
     this._handleSync = (event) => {
-      if (event.detail.source === this) return;
-      this._setTheme(event.detail.theme, {
-        emit: false,
+      const detail = event.detail;
+      const storageKey = this._storageKey();
+      if (
+        !detail ||
+        !storageKey ||
+        detail.source === this ||
+        detail.storageKey !== storageKey
+      ) return;
+
+      this._setTheme(detail.theme, {
+        notify: true,
         persist: false,
-        reflect: true
+        reflect: true,
+        synchronize: false
       });
     };
 
     this._handleStorage = (event) => {
-      if (event.key !== this._storageKey()) return;
+      const storageKey = this._storageKey();
+      if (!storageKey || event.key !== storageKey) return;
+
+      try {
+        if (event.storageArea !== window.localStorage) return;
+      } catch {
+        return;
+      }
+
       if (event.newValue !== "light" && event.newValue !== "dark") return;
       this._setTheme(event.newValue, {
-        emit: true,
+        notify: true,
         persist: false,
-        reflect: true
+        reflect: true,
+        synchronize: false
       });
     };
   }
@@ -344,8 +391,14 @@ class SkyshiftToggle extends HTMLElement {
     window.addEventListener("skyshift-theme-sync", this._handleSync);
     window.addEventListener("storage", this._handleStorage);
 
+    this._updateAccessibleName();
     const initialTheme = this._readInitialTheme();
-    this._setTheme(initialTheme, { emit: false, persist: false, reflect: true });
+    this._setTheme(initialTheme, {
+      notify: false,
+      persist: false,
+      reflect: true,
+      synchronize: false
+    });
   }
 
   disconnectedCallback() {
@@ -356,9 +409,21 @@ class SkyshiftToggle extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name !== "theme" || oldValue === newValue || this._reflecting || !this._connected) return;
+    if (oldValue === newValue) return;
+
+    if (name === "label" || name === "aria-label") {
+      this._updateAccessibleName();
+      return;
+    }
+
+    if (name !== "theme" || this._reflecting || !this._connected) return;
     if (newValue === "light" || newValue === "dark") {
-      this._setTheme(newValue, { emit: true, persist: true, reflect: false });
+      this._setTheme(newValue, {
+        notify: true,
+        persist: true,
+        reflect: false,
+        synchronize: true
+      });
     }
   }
 
@@ -370,7 +435,12 @@ class SkyshiftToggle extends HTMLElement {
     if (value !== "light" && value !== "dark") {
       throw new TypeError('theme must be "light" or "dark"');
     }
-    this._setTheme(value, { emit: true, persist: true, reflect: true });
+    this._setTheme(value, {
+      notify: true,
+      persist: true,
+      reflect: true,
+      synchronize: true
+    });
   }
 
   toggle() {
@@ -419,6 +489,11 @@ class SkyshiftToggle extends HTMLElement {
     }
   }
 
+  _updateAccessibleName() {
+    const label = this.getAttribute("label") || this.getAttribute("aria-label");
+    this._input.setAttribute("aria-label", label?.trim() || "Dark mode");
+  }
+
   _applyTheme(theme) {
     if (this.hasAttribute("no-apply")) return;
 
@@ -436,40 +511,44 @@ class SkyshiftToggle extends HTMLElement {
     target.style.colorScheme = theme;
   }
 
-  _setTheme(theme, options) {
+  _setTheme(theme, {
+    notify = false,
+    persist = false,
+    reflect = false,
+    synchronize = false
+  } = {}) {
     if (theme !== "light" && theme !== "dark") return;
 
     const changed = this._theme !== theme;
     this._theme = theme;
     this._input.checked = theme === "dark";
-    this._input.setAttribute("aria-label", theme === "dark"
-      ? "Switch to light mode"
-      : "Switch to dark mode");
 
-    if (options.reflect && this.getAttribute("theme") !== theme) {
+    if (reflect && this.getAttribute("theme") !== theme) {
       this._reflecting = true;
       this.setAttribute("theme", theme);
       this._reflecting = false;
     }
 
-    if (options.persist) this._storeTheme(theme);
+    const storageKey = this._storageKey();
+    if (persist) this._storeTheme(theme);
     this._applyTheme(theme);
 
-    if (options.emit && changed) {
+    if (notify && changed) {
       this.dispatchEvent(new CustomEvent("themechange", {
         bubbles: true,
         composed: true,
         detail: { theme }
       }));
+    }
+
+    if (synchronize && changed && storageKey && this._theme === theme) {
       window.dispatchEvent(new CustomEvent("skyshift-theme-sync", {
-        detail: { theme, source: this }
+        detail: { theme, storageKey, source: this }
       }));
     }
   }
 }
 
-if (!customElements.get("skyshift-toggle")) {
-  customElements.define("skyshift-toggle", SkyshiftToggle);
-}
-
-globalThis.SkyshiftToggle = SkyshiftToggle;
+customElements.define("skyshift-toggle", SkyshiftToggle);
+globalThis.SkyshiftToggle = customElements.get("skyshift-toggle");
+})();

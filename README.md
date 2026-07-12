@@ -9,7 +9,7 @@ Skyshift is an illustrated, dependency-free light and dark mode switch built as 
 - **Portable:** works with plain HTML, React, Vue, Svelte, Astro, and other modern web stacks.
 - **Dependency-free:** no framework, icon package, stylesheet, or build step required.
 - **Style-safe:** Shadow DOM prevents website CSS from breaking the illustration.
-- **Accessible:** native checkbox semantics, keyboard interaction, dynamic labels, focus visibility, and reduced-motion support.
+- **Accessible:** native checkbox semantics, keyboard interaction, a stable accessible name, focus visibility, and reduced-motion support.
 - **Persistent:** remembers the selected theme using `localStorage`.
 - **Customizable:** exposes CSS variables for every important visual color.
 
@@ -18,7 +18,7 @@ Skyshift is an illustrated, dependency-free light and dark mode switch built as 
 Copy [`skyshift.js`](./skyshift.js) into your project and load it as a deferred script:
 
 ```html
-<script src="/skyshift.js" defer></script>
+<script src="./skyshift.js" defer></script>
 
 <skyshift-toggle default-theme="system"></skyshift-toggle>
 ```
@@ -41,6 +41,30 @@ Add the matching website styles:
 }
 ```
 
+### Prevent an initial theme flash
+
+Because the component loads with `defer`, add this small script early in `<head>` if the page must use the saved theme before its first paint:
+
+```html
+<script>
+  (() => {
+    let theme;
+    try {
+      theme = localStorage.getItem("theme-mode");
+    } catch {}
+
+    if (theme !== "light" && theme !== "dark") {
+      theme = matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  })();
+</script>
+```
+
 Open [`index.html`](./index.html) to see a complete responsive demo. It also works when opened directly from your file browser; a local server is optional.
 
 ## Attributes
@@ -49,9 +73,10 @@ Open [`index.html`](./index.html) to see a complete responsive demo. It also wor
 | --- | --- | --- | --- |
 | `theme` | `light`, `dark` | — | Controls the current theme. |
 | `default-theme` | `light`, `dark`, `system` | `light` | Sets the initial fallback when no preference is saved. |
-| `storage-key` | Any string | `theme-mode` | Changes the localStorage key. Use an empty value to disable persistence. |
+| `storage-key` | Any string | `theme-mode` | Changes the localStorage and synchronization key. An empty value isolates the switch and disables persistence. |
 | `apply-to` | CSS selector | `html` | Selects the element that receives `data-theme`. |
 | `no-apply` | Boolean attribute | Off | Prevents automatic page changes so your app can handle the event itself. |
+| `label` | Any string | `Dark mode` | Sets the switch's stable accessible name. |
 
 Example with custom behavior:
 
@@ -62,6 +87,8 @@ Example with custom behavior:
   apply-to="body"
 ></skyshift-toggle>
 ```
+
+Switches with the same non-empty `storage-key` stay synchronized on the page and across tabs. Use `storage-key=""` for an independent preview or a fully controlled instance.
 
 ## JavaScript API
 
@@ -86,7 +113,7 @@ skyshift.toggle();
 
 ### `themechange`
 
-Listen for user or programmatic changes:
+Listen for user, programmatic, or synchronized changes:
 
 ```js
 skyshift.addEventListener("themechange", (event) => {
@@ -97,7 +124,7 @@ skyshift.addEventListener("themechange", (event) => {
 If your application owns theme state, add `no-apply` and update it from the event:
 
 ```html
-<skyshift-toggle no-apply></skyshift-toggle>
+<skyshift-toggle no-apply storage-key=""></skyshift-toggle>
 
 <script>
   document.querySelector("skyshift-toggle")
@@ -129,15 +156,13 @@ Available variable groups:
 - Sun: `--theme-switch-sun-light`, `--theme-switch-sun-mid`, `--theme-switch-sun-edge`
 - Night: `--theme-switch-night-top`, `--theme-switch-night-bottom`, `--theme-switch-night-border`, cloud colors, and `--theme-switch-night-ink`
 - Moon: `--theme-switch-moon-light`, `--theme-switch-moon-mid`, `--theme-switch-moon-edge`, `--theme-switch-moon-detail`
-- Focus: `--theme-switch-focus`
+- Interaction: `--theme-switch-focus`, `--theme-switch-hover-ring`
 
-When changing dimensions, keep the relationship below so the knob lands evenly on both sides:
-
-```text
-travel = width - knob size - (2 × inset)
-```
+Knob travel is calculated automatically from the width, knob size, and inset. Override `--theme-switch-travel` only when you want custom geometry.
 
 ## Framework examples
+
+The package can be imported during server rendering without accessing browser globals. Registration happens when the same module runs in the browser.
 
 ### React
 
