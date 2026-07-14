@@ -151,14 +151,14 @@ skyshift-toggle {
 
 Available variable groups:
 
-- Size: `--theme-switch-width`, `--theme-switch-height`, `--theme-switch-knob-size`, `--theme-switch-inset`, `--theme-switch-travel`
+- Size: `--theme-switch-width`, `--theme-switch-height`, `--theme-switch-knob-size`, `--theme-switch-inset`, `--theme-switch-border-width`, `--theme-switch-travel`
 - Day: `--theme-switch-day-top`, `--theme-switch-day-bottom`, `--theme-switch-day-border`, cloud colors, and `--theme-switch-day-ink`
 - Sun: `--theme-switch-sun-light`, `--theme-switch-sun-mid`, `--theme-switch-sun-edge`
 - Night: `--theme-switch-night-top`, `--theme-switch-night-bottom`, `--theme-switch-night-border`, cloud colors, and `--theme-switch-night-ink`
 - Moon: `--theme-switch-moon-light`, `--theme-switch-moon-mid`, `--theme-switch-moon-edge`, `--theme-switch-moon-detail`
 - Interaction: `--theme-switch-focus`, `--theme-switch-hover-ring`
 
-Knob travel is calculated automatically from the width, knob size, and inset. Override `--theme-switch-travel` only when you want custom geometry.
+Knob travel is calculated automatically from the width, knob size, inset, and border width. Override `--theme-switch-travel` only when you want custom geometry.
 
 ## Framework examples
 

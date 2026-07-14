@@ -21,11 +21,14 @@ skyshiftTemplate.innerHTML = `
       --theme-switch-height: 56px;
       --theme-switch-knob-size: 44px;
       --theme-switch-inset: 5px;
+      --theme-switch-border-width: 1px;
       --theme-switch-travel: calc(
         var(--theme-switch-width) -
         var(--theme-switch-knob-size) -
         var(--theme-switch-inset) -
-        var(--theme-switch-inset)
+        var(--theme-switch-inset) -
+        var(--theme-switch-border-width) -
+        var(--theme-switch-border-width)
       );
 
       --theme-switch-day-top: #f6df86;
@@ -52,8 +55,8 @@ skyshiftTemplate.innerHTML = `
       --theme-switch-moon-mid: #edf4fa;
       --theme-switch-moon-edge: #c9d8e5;
       --theme-switch-moon-detail: #7392ad;
-      --theme-switch-focus: #2684ff;
-      --theme-switch-hover-ring: rgba(38, 132, 255, .16);
+      --theme-switch-focus: #0868d4;
+      --theme-switch-hover-ring: rgba(8, 104, 212, .18);
 
       display: inline-block;
       width: var(--theme-switch-width);
@@ -91,14 +94,15 @@ skyshiftTemplate.innerHTML = `
       inset: 0;
       overflow: hidden;
       isolation: isolate;
-      border: 1px solid var(--theme-switch-day-border);
+      border: var(--theme-switch-border-width) solid var(--theme-switch-day-border);
       border-radius: 999px;
       background: linear-gradient(135deg,
         var(--theme-switch-day-top),
         var(--theme-switch-day-bottom));
       box-shadow:
-        inset 0 1px 2px rgba(70, 50, 10, .12),
-        0 7px 18px rgba(201, 157, 30, .2);
+        inset 0 1px 2px rgba(70, 50, 10, .1),
+        0 2px 4px rgba(0, 0, 0, .1),
+        0 6px 14px rgba(0, 0, 0, .14);
       transition: border-color 320ms ease, box-shadow 320ms ease;
     }
 
@@ -115,11 +119,17 @@ skyshiftTemplate.innerHTML = `
       transition: opacity 320ms cubic-bezier(.22, .61, .36, 1);
     }
 
-    .control:hover .track {
+    .track::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: inherit;
       box-shadow:
-        inset 0 1px 2px rgba(70, 50, 10, .12),
-        0 7px 18px rgba(201, 157, 30, .2),
-        0 0 0 4px var(--theme-switch-hover-ring);
+        inset 0 1px 0 rgba(255, 255, 255, .5),
+        inset 0 -1px 0 rgba(92, 68, 10, .08);
+      pointer-events: none;
+      transition: box-shadow 320ms ease;
     }
 
     input:focus-visible + .track {
@@ -130,19 +140,19 @@ skyshiftTemplate.innerHTML = `
     input:checked + .track {
       border-color: var(--theme-switch-night-border);
       box-shadow:
-        inset 0 1px 2px rgba(255, 255, 255, .12),
-        0 7px 20px rgba(6, 59, 114, .28);
-    }
-
-    .control:hover input:checked + .track {
-      box-shadow:
-        inset 0 1px 2px rgba(255, 255, 255, .12),
-        0 7px 20px rgba(6, 59, 114, .28),
-        0 0 0 4px var(--theme-switch-hover-ring);
+        inset 0 1px 2px rgba(255, 255, 255, .1),
+        0 2px 4px rgba(0, 0, 0, .1),
+        0 6px 14px rgba(0, 0, 0, .14);
     }
 
     input:checked + .track::before {
       opacity: 1;
+    }
+
+    input:checked + .track::after {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .22),
+        inset 0 -1px 0 rgba(0, 22, 43, .2);
     }
 
     .scene {
@@ -152,7 +162,6 @@ skyshiftTemplate.innerHTML = `
       width: 100%;
       height: 100%;
       pointer-events: none;
-      transition: opacity 260ms ease, transform 360ms ease;
     }
 
     .scene path {
@@ -168,6 +177,7 @@ skyshiftTemplate.innerHTML = `
     .day-scene {
       opacity: .84;
       transform: translateX(0);
+      transition: opacity 220ms ease, transform 360ms ease;
     }
 
     .day-scene .far { fill: var(--theme-switch-day-cloud-far); }
@@ -179,6 +189,7 @@ skyshiftTemplate.innerHTML = `
       opacity: 0;
       transform: translateX(-8px);
       color: var(--theme-switch-night-ink);
+      transition: opacity 90ms ease, transform 360ms ease;
     }
 
     .night-scene .far { fill: var(--theme-switch-night-cloud-far); }
@@ -190,16 +201,18 @@ skyshiftTemplate.innerHTML = `
     input:checked + .track .day-scene {
       opacity: 0;
       transform: translateX(8px);
+      transition: opacity 90ms ease, transform 360ms ease;
     }
 
     input:checked + .track .night-scene {
       opacity: .96;
       transform: translateX(0);
+      transition: opacity 220ms ease, transform 360ms ease;
     }
 
     .knob {
       position: absolute;
-      top: var(--theme-switch-inset);
+      top: 50%;
       left: var(--theme-switch-inset);
       z-index: 2;
       display: grid;
@@ -215,10 +228,13 @@ skyshiftTemplate.innerHTML = `
         var(--theme-switch-sun-edge));
       box-shadow:
         0 2px 10px rgba(180, 132, 12, .3),
-        inset 0 0 0 1px rgba(90, 67, 12, .16);
-      transform: translateX(0);
+        inset 0 0 0 1px color-mix(in srgb,
+          var(--theme-switch-day-ink) 34%, transparent);
+      translate: 0 -50%;
+      scale: 1;
       transition:
-        transform 340ms cubic-bezier(.22, .9, .28, 1.16),
+        translate 340ms cubic-bezier(.2, .85, .25, 1.08),
+        scale 140ms cubic-bezier(.2, .8, .2, 1),
         box-shadow 300ms ease;
     }
 
@@ -239,11 +255,27 @@ skyshiftTemplate.innerHTML = `
         transform 320ms cubic-bezier(.22, .61, .36, 1);
     }
 
+    .knob::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      z-index: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at 34% 26%,
+        rgba(255, 255, 255, .48),
+        rgba(255, 255, 255, .12) 28%,
+        transparent 48%);
+      opacity: .72;
+      pointer-events: none;
+      transition: opacity 260ms ease;
+    }
+
     input:checked + .track .knob {
       box-shadow:
         0 2px 10px rgba(5, 36, 68, .3),
-        inset 0 0 0 1px rgba(38, 74, 105, .18);
-      transform: translateX(var(--theme-switch-travel));
+        inset 0 0 0 1px color-mix(in srgb,
+          var(--theme-switch-moon-detail) 36%, transparent);
+      translate: var(--theme-switch-travel) -50%;
     }
 
     input:checked + .track .knob::before {
@@ -251,19 +283,19 @@ skyshiftTemplate.innerHTML = `
       transform: scale(1);
     }
 
-    input:active + .track .knob {
-      transform: scale(.9);
+    input:checked + .track .knob::after {
+      opacity: .24;
     }
 
-    input:checked:active + .track .knob {
-      transform: translateX(var(--theme-switch-travel)) scale(.9);
+    input:active + .track .knob {
+      scale: .92;
     }
 
     .moon {
       position: absolute;
       z-index: 1;
-      width: 34px;
-      height: 34px;
+      width: 78%;
+      height: 78%;
       opacity: 0;
       transform: rotate(-70deg) scale(.5);
       color: var(--theme-switch-moon-detail);
@@ -272,17 +304,86 @@ skyshiftTemplate.innerHTML = `
 
     .moon .shade {
       fill: currentColor;
-      fill-opacity: .08;
+      fill-opacity: .11;
     }
 
     .moon .crater {
       fill: currentColor;
-      fill-opacity: .16;
+      fill-opacity: .24;
     }
 
     input:checked + .track .moon {
       opacity: 1;
       transform: rotate(0) scale(1);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .control:hover .track {
+        box-shadow:
+          inset 0 1px 2px rgba(70, 50, 10, .1),
+          0 2px 4px rgba(0, 0, 0, .1),
+          0 6px 14px rgba(0, 0, 0, .14),
+          0 0 0 4px var(--theme-switch-hover-ring);
+      }
+
+      .control:hover input:checked + .track {
+        box-shadow:
+          inset 0 1px 2px rgba(255, 255, 255, .1),
+          0 2px 4px rgba(0, 0, 0, .1),
+          0 6px 14px rgba(0, 0, 0, .14),
+          0 0 0 4px var(--theme-switch-hover-ring);
+      }
+
+      .control:hover input:focus-visible + .track {
+        box-shadow:
+          inset 0 1px 2px rgba(70, 50, 10, .1),
+          0 2px 4px rgba(0, 0, 0, .1),
+          0 6px 14px rgba(0, 0, 0, .14);
+      }
+
+      .control:hover input:checked:focus-visible + .track {
+        box-shadow:
+          inset 0 1px 2px rgba(255, 255, 255, .1),
+          0 2px 4px rgba(0, 0, 0, .1),
+          0 6px 14px rgba(0, 0, 0, .14);
+      }
+    }
+
+    @media (forced-colors: active) {
+      .track,
+      input:checked + .track,
+      .control:hover .track,
+      .control:hover input:checked + .track {
+        border-color: CanvasText;
+        background: Canvas;
+        box-shadow: none;
+        forced-color-adjust: none;
+      }
+
+      .track::before {
+        background: Canvas;
+      }
+
+      .track::after,
+      .scene,
+      .moon,
+      .knob::after {
+        display: none;
+      }
+
+      .knob,
+      input:checked + .track .knob {
+        background: CanvasText;
+        box-shadow: none;
+      }
+
+      input:checked + .track .knob::before {
+        background: Highlight;
+      }
+
+      input:focus-visible + .track {
+        outline-color: Highlight;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -296,9 +397,9 @@ skyshiftTemplate.innerHTML = `
     <input type="checkbox" role="switch" aria-label="Dark mode">
     <span class="track" aria-hidden="true">
       <svg class="scene day-scene" viewBox="0 0 112 56" preserveAspectRatio="none">
-        <path class="far" d="M34 60V49c3-5 7-7 12-6 2-6 7-10 13-10 5 0 9 3 11 7 3-7 8-11 15-11 8 0 13 5 15 12 8-1 14 5 16 12v7Z"></path>
-        <path class="mid" d="M31 60V53c3-6 8-10 14-9 2-6 7-10 14-10 6 0 10 3 13 8 3-5 8-8 14-8 8 0 13 5 15 12 7 0 12 4 15 10v4Z"></path>
-        <path class="front" d="M28 60v-2c4-7 10-11 17-10 3-7 9-11 16-11 7 0 12 4 15 10 3-5 8-8 14-8 8 0 14 5 16 12 5 0 9 2 12 5v4Z"></path>
+        <path class="far" d="M33 60V50C36 44 41 41 47 43C49 35 53 31 59 32C65 32 70 36 73 41C77 33 83 29 90 29C98 29 103 36 104 43C111 42 116 47 118 54V60Z"></path>
+        <path class="mid" d="M30 60V54C33 49 37 46 42 46C45 41 49 39 54 39C59 39 63 42 65 46C68 39 73 34 79 34C85 34 90 40 91 46C95 41 100 39 105 41C111 43 115 49 118 56V60Z"></path>
+        <path class="front" d="M27 60V58C32 52 38 49 45 50C49 42 57 38 66 38C75 38 81 44 83 51C87 46 93 43 99 44C108 44 114 50 118 57V60Z"></path>
         <path class="line-art" d="M58 21q2.4-2.8 4.8 0q2.4-2.8 4.8 0M74 15q2-2.3 4 0q2-2.3 4 0M88 23q1.8-2 3.6 0q1.8-2 3.6 0M98 13q1.4-1.7 2.8 0q1.4-1.7 2.8 0"></path>
       </svg>
 

@@ -33,6 +33,7 @@
         --line: #d9d6cd;
         --accent: #806718;
         --stage: #e8e4d9;
+        --stage-glow: rgba(255, 255, 255, .58);
         --stage-grid: rgba(35, 34, 30, .07);
         --code: #191918;
         --code-text: #f5f2e9;
@@ -54,6 +55,7 @@
         --line: #27333d;
         --accent: #69b7f7;
         --stage: #091f33;
+        --stage-glow: rgba(40, 132, 204, .14);
         --stage-grid: rgba(189, 220, 244, .08);
         --code: #060a0e;
         --code-text: #e9f2f8;
@@ -146,8 +148,8 @@
 
       skyshift-toggle:not(:defined) {
         display: inline-block;
-        width: 112px;
-        height: 56px;
+        width: var(--theme-switch-width, 112px);
+        height: var(--theme-switch-height, 56px);
         visibility: hidden;
         vertical-align: middle;
       }
@@ -222,9 +224,10 @@
       }
 
       .site-nav skyshift-toggle {
-        scale: .64;
-        transform-origin: right center;
-        margin-left: -32px;
+        --theme-switch-width: 88px;
+        --theme-switch-height: 44px;
+        --theme-switch-knob-size: 34px;
+        --theme-switch-inset: 4px;
       }
 
       main {
@@ -317,8 +320,6 @@
         border-radius: 24px;
         background: var(--surface);
         box-shadow: 0 24px 70px var(--shadow);
-        clip-path: inset(0 round 24px);
-        contain: paint;
         isolation: isolate;
       }
 
@@ -358,10 +359,11 @@
         overflow: clip;
         background-color: var(--stage);
         background-image:
+          radial-gradient(circle at 50% 48%, var(--stage-glow), transparent 34%),
           linear-gradient(var(--stage-grid) 1px, transparent 1px),
           linear-gradient(90deg, var(--stage-grid) 1px, transparent 1px);
-        background-size: 48px 48px;
-        clip-path: inset(0);
+        background-repeat: no-repeat, repeat, repeat;
+        background-size: 100% 100%, 48px 48px, 48px 48px;
         transition: background-color 360ms cubic-bezier(.22, .61, .36, 1);
       }
 
@@ -565,7 +567,7 @@
       }
 
       .palette-option {
-        min-height: 42px;
+        min-height: 44px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -606,7 +608,7 @@
       }
 
       .surface-option {
-        min-height: 34px;
+        min-height: 44px;
         border-radius: 7px;
         font-size: .7rem;
         font-weight: 650;
@@ -616,8 +618,7 @@
         min-width: 0;
         overflow: clip;
         border-radius: 16px;
-        clip-path: inset(0 round 16px);
-        contain: paint;
+        container: integration-preview / inline-size;
       }
 
       .integration-bar {
@@ -797,9 +798,10 @@
       }
 
       .mock-header skyshift-toggle {
-        scale: .62;
-        transform-origin: right center;
-        margin-left: -32px;
+        --theme-switch-width: 88px;
+        --theme-switch-height: 44px;
+        --theme-switch-knob-size: 34px;
+        --theme-switch-inset: 4px;
       }
 
       .mock-main {
@@ -860,6 +862,30 @@
         background: var(--preview-surface);
         color: var(--preview-muted);
         font: 500 .67rem/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      @container integration-preview (max-width: 520px) {
+        .mock-header {
+          padding-inline: 18px;
+        }
+
+        .mock-nav span {
+          display: none;
+        }
+
+        .mock-main {
+          grid-template-columns: 1fr;
+          gap: 24px;
+          padding: 38px 24px 24px;
+        }
+
+        .mock-card {
+          min-height: 120px;
+        }
+
+        .custom-code {
+          margin: 0 24px 24px;
+        }
       }
 
       .site-footer {
@@ -936,7 +962,6 @@
 
         .product-frame {
           border-radius: 16px;
-          clip-path: inset(0 round 16px);
         }
 
         .frame-bar {
@@ -949,7 +974,7 @@
 
         .demo-stage {
           min-height: 360px;
-          background-size: 36px 36px;
+          background-size: 100% 100%, 36px 36px, 36px 36px;
         }
 
         .demo-content skyshift-toggle {
@@ -980,28 +1005,6 @@
         .customizer-group + .customizer-group {
           border-top: 1px solid var(--line);
           border-left: 0;
-        }
-
-        .mock-header {
-          padding-inline: 18px;
-        }
-
-        .mock-nav span {
-          display: none;
-        }
-
-        .mock-main {
-          grid-template-columns: 1fr;
-          gap: 24px;
-          padding: 38px 24px 24px;
-        }
-
-        .mock-card {
-          min-height: 120px;
-        }
-
-        .custom-code {
-          margin: 0 24px 24px;
         }
 
         .site-footer {
@@ -1063,7 +1066,7 @@
           </div>
         </div>
         <div class="metrics" role="list" aria-label="Skyshift facts">
-          <div class="metric" role="listitem"><strong>≈ 16 KB</strong><span>Source size</span></div>
+          <div class="metric" role="listitem"><strong>≈ 20 KB</strong><span>Source size</span></div>
           <div class="metric" role="listitem"><strong>Zero</strong><span>Dependencies</span></div>
           <div class="metric" role="listitem"><strong>Native</strong><span>Input semantics</span></div>
           <div class="metric" role="listitem"><strong>Shadow DOM</strong><span>Style isolation</span></div>
