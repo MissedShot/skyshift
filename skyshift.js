@@ -864,6 +864,18 @@ class SkyshiftToggle extends HTMLElement {
     });
   }
 
+  _dispatchThemeProgress(progress, { active, dragging }) {
+    this.dispatchEvent(new CustomEvent("themeprogress", {
+      bubbles: true,
+      composed: true,
+      detail: {
+        progress: skyshiftClamp(progress),
+        active,
+        dragging
+      }
+    }));
+  }
+
   _renderProgress(progress, { held = false, travel = this._dragTravel() } = {}) {
     const value = skyshiftClamp(progress);
     const palette = skyshiftPaletteAt(value);
@@ -928,6 +940,7 @@ class SkyshiftToggle extends HTMLElement {
     this._track.style.background =
       `linear-gradient(135deg, ${palette.top}, ${palette.bottom})`;
     this._track.style.borderColor = palette.border;
+    this._dispatchThemeProgress(value, { active: true, dragging: held });
   }
 
   _settleProgress(start, target, travel = this._dragTravel()) {
@@ -984,6 +997,7 @@ class SkyshiftToggle extends HTMLElement {
   }
 
   _clearProgress() {
+    const wasActive = this._visualProgress !== null;
     const properties = [
       "--skyshift-knob-x",
       "--skyshift-knob-scale-x",
@@ -1014,6 +1028,12 @@ class SkyshiftToggle extends HTMLElement {
     }
     this._track.style.removeProperty("background");
     this._track.style.removeProperty("border-color");
+    if (wasActive) {
+      this._dispatchThemeProgress(this.theme === "dark" ? 1 : 0, {
+        active: false,
+        dragging: false
+      });
+    }
   }
 
   _dragTravel() {

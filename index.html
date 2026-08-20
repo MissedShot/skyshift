@@ -24,21 +24,76 @@
     <style>
       :root {
         color-scheme: light;
-        --page: #f3f1eb;
-        --surface: #faf9f5;
-        --surface-raised: #ffffff;
-        --text: #171715;
-        --muted: #5f5d57;
-        --faint: #716e66;
-        --line: #d9d6cd;
-        --accent: #806718;
-        --stage: #e8e4d9;
-        --stage-glow: rgba(255, 255, 255, .58);
-        --stage-grid: rgba(35, 34, 30, .07);
-        --code: #191918;
-        --code-text: #f5f2e9;
-        --button-text: #f8f7f2;
-        --shadow: rgba(35, 31, 20, .08);
+        --light-page: #f3f1eb;
+        --light-surface: #faf9f5;
+        --light-surface-raised: #ffffff;
+        --light-text: #171715;
+        --light-muted: #5f5d57;
+        --light-faint: #716e66;
+        --light-line: #d9d6cd;
+        --light-accent: #806718;
+        --light-stage: #e8e4d9;
+        --light-stage-glow: rgba(255, 255, 255, .58);
+        --light-stage-grid: rgba(35, 34, 30, .07);
+        --light-code: #191918;
+        --light-code-text: #f5f2e9;
+        --light-button-text: #f8f7f2;
+        --light-shadow: rgba(35, 31, 20, .08);
+
+        --dark-page: #0d1319;
+        --dark-surface: #111a22;
+        --dark-surface-raised: #16222d;
+        --dark-text: #edf1f3;
+        --dark-muted: #a3adb5;
+        --dark-faint: #7d8992;
+        --dark-line: #27333d;
+        --dark-accent: #69b7f7;
+        --dark-stage: #091f33;
+        --dark-stage-glow: rgba(40, 132, 204, .14);
+        --dark-stage-grid: rgba(189, 220, 244, .08);
+        --dark-code: #060a0e;
+        --dark-code-text: #e9f2f8;
+        --dark-button-text: #101418;
+        --dark-shadow: rgba(0, 0, 0, .22);
+
+        --dusk-page: #665765;
+        --dusk-surface: #71616f;
+        --dusk-surface-raised: #7a6977;
+        --dusk-line: #8c7788;
+        --dusk-accent: #d49378;
+        --dusk-stage: #4d425f;
+        --dusk-stage-glow: rgba(226, 160, 145, .2);
+        --dusk-stage-grid: rgba(240, 220, 233, .1);
+        --dusk-code: #25212b;
+        --dusk-shadow: rgba(47, 31, 48, .18);
+
+        --theme-progress: 0%;
+        --theme-ink-progress: 0%;
+        --theme-dusk-wash: 0%;
+        --theme-contrast-boost: 0%;
+        --theme-muted-boost: 0%;
+        --theme-surface-duration: 360ms;
+        --theme-ink-duration: 300ms;
+        --page: color-mix(in oklab, color-mix(in oklab, var(--light-page) calc(100% - var(--theme-progress)), var(--dark-page) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-page) var(--theme-dusk-wash));
+        --surface: color-mix(in oklab, color-mix(in oklab, var(--light-surface) calc(100% - var(--theme-progress)), var(--dark-surface) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-surface) var(--theme-dusk-wash));
+        --surface-raised: color-mix(in oklab, color-mix(in oklab, var(--light-surface-raised) calc(100% - var(--theme-progress)), var(--dark-surface-raised) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-surface-raised) var(--theme-dusk-wash));
+        --text-base: color-mix(in oklab, var(--light-text) calc(100% - var(--theme-ink-progress)), var(--dark-text) var(--theme-ink-progress));
+        --text-contrast: color-mix(in oklab, #050505 calc(100% - var(--theme-ink-progress)), #ffffff var(--theme-ink-progress));
+        --text: color-mix(in oklab, var(--text-base) calc(100% - var(--theme-contrast-boost)), var(--text-contrast) var(--theme-contrast-boost));
+        --muted-base: color-mix(in oklab, var(--light-muted) calc(100% - var(--theme-ink-progress)), var(--dark-muted) var(--theme-ink-progress));
+        --faint-base: color-mix(in oklab, var(--light-faint) calc(100% - var(--theme-ink-progress)), var(--dark-faint) var(--theme-ink-progress));
+        --muted: color-mix(in oklab, var(--muted-base) calc(100% - var(--theme-muted-boost)), var(--text) var(--theme-muted-boost));
+        --faint: color-mix(in oklab, var(--faint-base) calc(100% - var(--theme-muted-boost)), var(--text) var(--theme-muted-boost));
+        --line: color-mix(in oklab, color-mix(in oklab, var(--light-line) calc(100% - var(--theme-progress)), var(--dark-line) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-line) var(--theme-dusk-wash));
+        --accent: color-mix(in oklab, color-mix(in oklab, var(--light-accent) calc(100% - var(--theme-progress)), var(--dark-accent) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-accent) var(--theme-dusk-wash));
+        --accent-ink: color-mix(in oklab, var(--accent) calc(100% - var(--theme-muted-boost)), var(--text) var(--theme-muted-boost));
+        --stage: color-mix(in oklab, color-mix(in oklab, var(--light-stage) calc(100% - var(--theme-progress)), var(--dark-stage) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-stage) var(--theme-dusk-wash));
+        --stage-glow: color-mix(in oklab, color-mix(in oklab, var(--light-stage-glow) calc(100% - var(--theme-progress)), var(--dark-stage-glow) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-stage-glow) var(--theme-dusk-wash));
+        --stage-grid: color-mix(in oklab, color-mix(in oklab, var(--light-stage-grid) calc(100% - var(--theme-progress)), var(--dark-stage-grid) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-stage-grid) var(--theme-dusk-wash));
+        --code: color-mix(in oklab, color-mix(in oklab, var(--light-code) calc(100% - var(--theme-progress)), var(--dark-code) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-code) var(--theme-dusk-wash));
+        --code-text: color-mix(in oklab, var(--light-code-text) calc(100% - var(--theme-ink-progress)), var(--dark-code-text) var(--theme-ink-progress));
+        --button-text: color-mix(in oklab, var(--light-button-text) calc(100% - var(--theme-ink-progress)), var(--dark-button-text) var(--theme-ink-progress));
+        --shadow: color-mix(in oklab, color-mix(in oklab, var(--light-shadow) calc(100% - var(--theme-progress)), var(--dark-shadow) var(--theme-progress)) calc(100% - var(--theme-dusk-wash)), var(--dusk-shadow) var(--theme-dusk-wash));
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         background: var(--page);
         color: var(--text);
@@ -46,21 +101,13 @@
 
       :root[data-theme="dark"] {
         color-scheme: dark;
-        --page: #0d1319;
-        --surface: #111a22;
-        --surface-raised: #16222d;
-        --text: #edf1f3;
-        --muted: #a3adb5;
-        --faint: #7d8992;
-        --line: #27333d;
-        --accent: #69b7f7;
-        --stage: #091f33;
-        --stage-glow: rgba(40, 132, 204, .14);
-        --stage-grid: rgba(189, 220, 244, .08);
-        --code: #060a0e;
-        --code-text: #e9f2f8;
-        --button-text: #101418;
-        --shadow: rgba(0, 0, 0, .22);
+        --theme-progress: 100%;
+        --theme-ink-progress: 100%;
+      }
+
+      :root[data-theme-preview] {
+        --theme-surface-duration: 0ms;
+        --theme-ink-duration: 0ms;
       }
 
       * {
@@ -71,7 +118,7 @@
         min-width: 320px;
         scroll-behavior: smooth;
         background: var(--page);
-        transition: background-color 360ms cubic-bezier(.22, .61, .36, 1);
+        transition: background-color var(--theme-surface-duration) cubic-bezier(.22, .61, .36, 1);
       }
 
       body {
@@ -80,8 +127,8 @@
         background: var(--page);
         color: var(--text);
         transition:
-          background-color 360ms cubic-bezier(.22, .61, .36, 1),
-          color 300ms cubic-bezier(.22, .61, .36, 1);
+          background-color var(--theme-surface-duration) cubic-bezier(.22, .61, .36, 1),
+          color var(--theme-ink-duration) cubic-bezier(.22, .61, .36, 1);
       }
 
       .site-header,
@@ -103,10 +150,10 @@
       .custom-code,
       .site-footer {
         transition:
-          background-color 360ms cubic-bezier(.22, .61, .36, 1),
-          border-color 360ms cubic-bezier(.22, .61, .36, 1),
-          color 300ms cubic-bezier(.22, .61, .36, 1),
-          box-shadow 360ms cubic-bezier(.22, .61, .36, 1);
+          background-color var(--theme-surface-duration) cubic-bezier(.22, .61, .36, 1),
+          border-color var(--theme-surface-duration) cubic-bezier(.22, .61, .36, 1),
+          color var(--theme-ink-duration) cubic-bezier(.22, .61, .36, 1),
+          box-shadow var(--theme-surface-duration) cubic-bezier(.22, .61, .36, 1);
       }
 
       .site-nav a,
@@ -126,7 +173,7 @@
       .mock-nav,
       .mock-kicker,
       .site-footer {
-        transition: color 300ms cubic-bezier(.22, .61, .36, 1);
+        transition: color var(--theme-ink-duration) cubic-bezier(.22, .61, .36, 1);
       }
 
       a {
@@ -135,7 +182,7 @@
 
       a:focus-visible,
       button:focus-visible {
-        outline: 3px solid var(--accent);
+        outline: 3px solid var(--accent-ink);
         outline-offset: 3px;
       }
 
@@ -243,7 +290,7 @@
 
       .kicker {
         margin: 0 0 22px;
-        color: var(--accent);
+        color: var(--accent-ink);
         font: 700 .72rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
         letter-spacing: .12em;
         text-transform: uppercase;
@@ -1032,7 +1079,7 @@
         <a href="#details">Details</a>
         <a href="#customize">Customize</a>
         <a href="https://github.com/MissedShot/skyshift">GitHub</a>
-        <skyshift-toggle default-theme="system" label="Website theme"></skyshift-toggle>
+        <skyshift-toggle data-page-theme default-theme="system" label="Website theme"></skyshift-toggle>
       </nav>
     </header>
 
@@ -1058,7 +1105,7 @@
         </div>
         <div class="demo-stage">
           <div class="demo-content">
-            <skyshift-toggle default-theme="system" label="Preview theme"></skyshift-toggle>
+            <skyshift-toggle data-page-theme default-theme="system" label="Preview theme"></skyshift-toggle>
             <div class="demo-caption">
               <strong>Change the atmosphere</strong>
               <span>Use the switch to preview both states</span>
@@ -1066,7 +1113,7 @@
           </div>
         </div>
         <div class="metrics" role="list" aria-label="Skyshift facts">
-          <div class="metric" role="listitem"><strong>≈ 36 KB</strong><span>Source size</span></div>
+          <div class="metric" role="listitem"><strong>≈ 37 KB</strong><span>Source size</span></div>
           <div class="metric" role="listitem"><strong>Zero</strong><span>Dependencies</span></div>
           <div class="metric" role="listitem"><strong>Native</strong><span>Input semantics</span></div>
           <div class="metric" role="listitem"><strong>Shadow DOM</strong><span>Style isolation</span></div>
@@ -1182,6 +1229,66 @@
     </footer>
     <script>
       (() => {
+        const root = document.documentElement;
+        const pageThemeToggles = document.querySelectorAll('[data-page-theme]');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let previewFrame = 0;
+        let previewOwner = null;
+        let pendingProgress = 0;
+
+        const setPageProgress = (progress) => {
+          const value = Math.min(1, Math.max(0, progress));
+          const contrastCurve = Math.sqrt(4 * value * (1 - value));
+          root.style.setProperty('--theme-progress', `${value * 100}%`);
+          root.style.setProperty('--theme-dusk-wash', `${4 * value * (1 - value) * 58}%`);
+          root.style.setProperty('--theme-contrast-boost', `${contrastCurve * 100}%`);
+          root.style.setProperty('--theme-muted-boost', `${Math.min(1, contrastCurve * 1.05) * 100}%`);
+          root.style.setProperty('--theme-ink-progress', value >= .37 ? '100%' : '0%');
+        };
+
+        const endPagePreview = () => {
+          if (previewFrame) cancelAnimationFrame(previewFrame);
+          previewFrame = 0;
+          previewOwner = null;
+          root.removeAttribute('data-theme-preview');
+          root.style.removeProperty('--theme-progress');
+          root.style.removeProperty('--theme-dusk-wash');
+          root.style.removeProperty('--theme-contrast-boost');
+          root.style.removeProperty('--theme-muted-boost');
+          root.style.removeProperty('--theme-ink-progress');
+        };
+
+        const queuePageProgress = (progress) => {
+          pendingProgress = progress;
+          if (previewFrame) return;
+          previewFrame = requestAnimationFrame(() => {
+            previewFrame = 0;
+            setPageProgress(pendingProgress);
+          });
+        };
+
+        pageThemeToggles.forEach((toggle) => {
+          toggle.addEventListener('themeprogress', (event) => {
+            const { progress, active } = event.detail;
+            if (reducedMotion.matches) {
+              if (previewOwner === toggle) endPagePreview();
+              return;
+            }
+
+            if (!active) {
+              if (previewOwner === toggle) endPagePreview();
+              return;
+            }
+
+            if (previewOwner !== toggle) {
+              previewOwner = toggle;
+              root.setAttribute('data-theme-preview', '');
+              setPageProgress(progress);
+            }
+            queuePageProgress(progress);
+          });
+        });
+
         const customizer = document.querySelector('[data-customizer]');
         if (!customizer) return;
 

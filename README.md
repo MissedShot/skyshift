@@ -26,7 +26,7 @@ Copy [`skyshift.js`](./skyshift.js) into your project and load it as a deferred 
 
 Skyshift sets `data-theme="light"` or `data-theme="dark"` on the `<html>` element and updates `color-scheme` automatically.
 
-While dragging, only the illustration previews the continuous day-to-night transition. The native switch state, page theme, storage, synchronization, and `themechange` event commit once when the gesture is released.
+By default, only the illustration previews the continuous day-to-night transition while dragging. Use the opt-in `themeprogress` event to synchronize surrounding surfaces. The native switch state, page theme, storage, synchronization, and `themechange` event still commit once when the gesture is released.
 
 Add the matching website styles:
 
@@ -136,6 +136,23 @@ If your application owns theme state, add `no-apply` and update it from the even
     });
 </script>
 ```
+
+### `themeprogress`
+
+Synchronize surrounding UI with Skyshift's transient drag and settle progress:
+
+```js
+skyshift.addEventListener("themeprogress", ({ detail }) => {
+  const { progress, active, dragging } = detail;
+  console.log({ progress, active, dragging });
+});
+```
+
+- `progress` is a clamped number from `0` (light) to `1` (dark).
+- `active` stays `true` while drag or settle owns the visual preview.
+- `dragging` is `true` only while the pointer directly controls the knob.
+
+`themeprogress` is visual-only: it does not change checkbox semantics, persistence, synchronization, or the committed theme. The demo uses it to interpolate page design tokens during direct manipulation.
 
 ## Customize the illustration
 
