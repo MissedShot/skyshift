@@ -78,6 +78,7 @@ skyshiftTemplate.innerHTML = `
       height: 100%;
       cursor: pointer;
       border-radius: 999px;
+      user-select: none;
     }
 
     input {
@@ -89,6 +90,7 @@ skyshiftTemplate.innerHTML = `
       margin: 0;
       opacity: 0;
       cursor: inherit;
+      touch-action: pan-y;
     }
 
     .track {
@@ -295,6 +297,18 @@ skyshiftTemplate.innerHTML = `
       scale: var(--theme-switch-press-stretch) var(--theme-switch-press-squash);
     }
 
+    .control.is-dragging {
+      cursor: grabbing;
+    }
+
+    .control.is-dragging .knob {
+      translate: var(--theme-switch-drag-x) -50%;
+      scale: var(--theme-switch-press-stretch) var(--theme-switch-press-squash);
+      transition:
+        scale 100ms cubic-bezier(.2, .8, .2, 1),
+        box-shadow 300ms ease;
+    }
+
     .moon {
       position: absolute;
       z-index: 1;
@@ -395,7 +409,8 @@ skyshiftTemplate.innerHTML = `
         transition: none !important;
       }
 
-      input:active + .track .knob {
+      input:active + .track .knob,
+      .control.is-dragging .knob {
         scale: 1;
       }
     }
@@ -443,20 +458,85 @@ class SkyshiftToggle extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot.append(skyshiftTemplate.content.cloneNode(true));
     this._input = this.shadowRoot.querySelector("input");
+    this._control = this.shadowRoot.querySelector(".control");
+    this._track = this.shadowRoot.querySelector(".track");
+    this._knob = this.shadowRoot.querySelector(".knob");
     this._reflecting = false;
     this._connected = false;
     this._initialized = false;
     this._followsSystem = false;
     this._systemThemeQuery = null;
+    this._drag = null;
+    this._suppressClick = false;
 
     this._handleChange = () => {
-      this._stopFollowingSystem();
-      this._setTheme(this._input.checked ? "dark" : "light", {
-        notify: true,
-        persist: true,
-        reflect: true,
-        synchronize: true
-      });
+      this._commitUserTheme(this._input.checked ? "dark" : "light");
+    };
+
+    this._handlePointerDown = (event) => {
+      if (event.button !== 0 || event.isPrimary === false || this._drag) return;
+
+      const travel = this._dragTravel();
+      if (travel <= 0) return;
+
+      const renderedWidth = this._track.getBoundingClientRect().width;
+      const layoutWidth = this._track.offsetWidth;
+      this._drag = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startPosition: this._input.checked ? travel : 0,
+        position: this._input.checked ? travel : 0,
+        travel,
+        pixelScale: renderedWidth > 0 && layoutWidth > 0
+          ? renderedWidth / layoutWidth
+          : 1,
+        moved: false
+      };
+      this._input.setPointerCapture?.(event.pointerId);
+    };
+
+    this._handlePointerMove = (event) => {
+      const drag = this._drag;
+      if (!drag || event.pointerId !== drag.pointerId) return;
+
+      const delta = (event.clientX - drag.startX) / drag.pixelScale;
+      if (!drag.moved && Math.abs(delta) < 4) return;
+
+      drag.moved = true;
+      drag.position = Math.min(drag.travel, Math.max(0, drag.startPosition + delta));
+      this._knob.style.setProperty("--theme-switch-drag-x", `${drag.position}px`);
+      this._control.classList.add("is-dragging");
+      this._input.checked = drag.position >= drag.travel / 2;
+      event.preventDefault();
+    };
+
+    this._handlePointerUp = (event) => {
+      const drag = this._drag;
+      if (!drag || event.pointerId !== drag.pointerId) return;
+
+      if (drag.moved) {
+        event.preventDefault();
+        this._commitUserTheme(drag.position >= drag.travel / 2 ? "dark" : "light");
+        this._suppressClick = true;
+        window.setTimeout(() => {
+          this._suppressClick = false;
+        }, 0);
+      }
+
+      this._finishDrag();
+    };
+
+    this._handlePointerCancel = (event) => {
+      if (!this._drag || event.pointerId !== this._drag.pointerId) return;
+      this._input.checked = this.theme === "dark";
+      this._finishDrag();
+    };
+
+    this._handleClick = (event) => {
+      if (!this._suppressClick) return;
+      this._suppressClick = false;
+      event.preventDefault();
+      this._input.checked = this.theme === "dark";
     };
 
     this._handleSync = (event) => {
@@ -518,6 +598,11 @@ class SkyshiftToggle extends HTMLElement {
     if (this._connected) return;
     this._connected = true;
     this._input.addEventListener("change", this._handleChange);
+    this._input.addEventListener("pointerdown", this._handlePointerDown);
+    this._input.addEventListener("pointermove", this._handlePointerMove);
+    this._input.addEventListener("pointerup", this._handlePointerUp);
+    this._input.addEventListener("pointercancel", this._handlePointerCancel);
+    this._input.addEventListener("click", this._handleClick);
     window.addEventListener("skyshift-theme-sync", this._handleSync);
     window.addEventListener("storage", this._handleStorage);
 
@@ -551,9 +636,15 @@ class SkyshiftToggle extends HTMLElement {
 
   disconnectedCallback() {
     this._input.removeEventListener("change", this._handleChange);
+    this._input.removeEventListener("pointerdown", this._handlePointerDown);
+    this._input.removeEventListener("pointermove", this._handlePointerMove);
+    this._input.removeEventListener("pointerup", this._handlePointerUp);
+    this._input.removeEventListener("pointercancel", this._handlePointerCancel);
+    this._input.removeEventListener("click", this._handleClick);
     window.removeEventListener("skyshift-theme-sync", this._handleSync);
     window.removeEventListener("storage", this._handleStorage);
     this._systemThemeQuery?.removeEventListener("change", this._handleSystemThemeChange);
+    this._finishDrag();
     this._connected = false;
   }
 
@@ -596,6 +687,34 @@ class SkyshiftToggle extends HTMLElement {
 
   toggle() {
     this.theme = this.theme === "dark" ? "light" : "dark";
+  }
+
+  _commitUserTheme(theme) {
+    this._stopFollowingSystem();
+    this._setTheme(theme, {
+      notify: true,
+      persist: true,
+      reflect: true,
+      synchronize: true
+    });
+  }
+
+  _dragTravel() {
+    return Math.max(
+      0,
+      this._track.clientWidth - this._knob.offsetWidth - (2 * this._knob.offsetLeft)
+    );
+  }
+
+  _finishDrag() {
+    const pointerId = this._drag?.pointerId;
+    this._drag = null;
+    this._control.classList.remove("is-dragging");
+    this._knob.style.removeProperty("--theme-switch-drag-x");
+
+    if (pointerId !== undefined && this._input.hasPointerCapture?.(pointerId)) {
+      this._input.releasePointerCapture(pointerId);
+    }
   }
 
   _readInitialTheme() {

@@ -10,7 +10,7 @@ Skyshift is an illustrated, dependency-free light and dark mode switch built as 
 - **Dependency-free:** no framework, icon package, stylesheet, or build step required.
 - **Style-safe:** Shadow DOM prevents website CSS from breaking the illustration.
 - **Accessible:** native checkbox semantics, keyboard interaction, a stable accessible name, focus visibility, and reduced-motion support.
-- **Responsive:** the sun and moon stretch toward their next position while pressed, then spring back into shape.
+- **Responsive:** press for elastic feedback, or drag the sun and moon across the track to choose a theme directly.
 - **Persistent:** remembers the selected theme using `localStorage`.
 - **Customizable:** exposes CSS variables for every important visual color.
 
