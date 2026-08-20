@@ -30,8 +30,8 @@ skyshiftTemplate.innerHTML = `
         var(--theme-switch-border-width) -
         var(--theme-switch-border-width)
       );
-      --theme-switch-press-stretch: 1.22;
-      --theme-switch-press-squash: .88;
+      --theme-switch-press-stretch: 1.14;
+      --theme-switch-press-squash: .95;
 
       --theme-switch-day-top: #f6df86;
       --theme-switch-day-bottom: #fff2c2;
@@ -238,8 +238,8 @@ skyshiftTemplate.innerHTML = `
       scale: 1;
       transform-origin: left center;
       transition:
-        translate 340ms cubic-bezier(.2, .85, .25, 1.08),
-        scale 140ms cubic-bezier(.2, .8, .2, 1),
+        translate 380ms cubic-bezier(.16, 1, .3, 1),
+        scale 220ms cubic-bezier(.16, 1, .3, 1),
         box-shadow 300ms ease;
     }
 
@@ -304,8 +304,10 @@ skyshiftTemplate.innerHTML = `
     .control.is-dragging .knob {
       translate: var(--theme-switch-drag-x) -50%;
       scale: var(--theme-switch-press-stretch) var(--theme-switch-press-squash);
+      transform-origin: center;
       transition:
-        scale 100ms cubic-bezier(.2, .8, .2, 1),
+        translate 70ms cubic-bezier(.2, .8, .2, 1),
+        scale 180ms cubic-bezier(.16, 1, .3, 1),
         box-shadow 300ms ease;
     }
 
@@ -490,6 +492,7 @@ class SkyshiftToggle extends HTMLElement {
         pixelScale: renderedWidth > 0 && layoutWidth > 0
           ? renderedWidth / layoutWidth
           : 1,
+        previewDark: this._input.checked,
         moved: false
       };
       this._input.setPointerCapture?.(event.pointerId);
@@ -506,7 +509,11 @@ class SkyshiftToggle extends HTMLElement {
       drag.position = Math.min(drag.travel, Math.max(0, drag.startPosition + delta));
       this._knob.style.setProperty("--theme-switch-drag-x", `${drag.position}px`);
       this._control.classList.add("is-dragging");
-      this._input.checked = drag.position >= drag.travel / 2;
+
+      const progress = drag.position / drag.travel;
+      if (!drag.previewDark && progress >= .56) drag.previewDark = true;
+      if (drag.previewDark && progress <= .44) drag.previewDark = false;
+      this._input.checked = drag.previewDark;
       event.preventDefault();
     };
 
