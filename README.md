@@ -10,6 +10,7 @@ Skyshift is an illustrated, dependency-free light and dark mode switch built as 
 - **Dependency-free:** no framework, icon package, stylesheet, or build step required.
 - **Style-safe:** Shadow DOM prevents website CSS from breaking the illustration.
 - **Accessible:** native checkbox semantics, keyboard interaction, a stable accessible name, focus visibility, and reduced-motion support.
+- **Responsive:** the sun and moon stretch toward their next position while pressed, then spring back into shape.
 - **Persistent:** remembers the selected theme using `localStorage`.
 - **Customizable:** exposes CSS variables for every important visual color.
 
@@ -151,7 +152,7 @@ skyshift-toggle {
 
 Available variable groups:
 
-- Size: `--theme-switch-width`, `--theme-switch-height`, `--theme-switch-knob-size`, `--theme-switch-inset`, `--theme-switch-border-width`, `--theme-switch-travel`
+- Size and motion: `--theme-switch-width`, `--theme-switch-height`, `--theme-switch-knob-size`, `--theme-switch-inset`, `--theme-switch-border-width`, `--theme-switch-travel`, `--theme-switch-press-stretch`, `--theme-switch-press-squash`
 - Day: `--theme-switch-day-top`, `--theme-switch-day-bottom`, `--theme-switch-day-border`, cloud colors, and `--theme-switch-day-ink`
 - Sun: `--theme-switch-sun-light`, `--theme-switch-sun-mid`, `--theme-switch-sun-edge`
 - Night: `--theme-switch-night-top`, `--theme-switch-night-bottom`, `--theme-switch-night-border`, cloud colors, and `--theme-switch-night-ink`

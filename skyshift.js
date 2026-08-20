@@ -30,6 +30,8 @@ skyshiftTemplate.innerHTML = `
         var(--theme-switch-border-width) -
         var(--theme-switch-border-width)
       );
+      --theme-switch-press-stretch: 1.22;
+      --theme-switch-press-squash: .88;
 
       --theme-switch-day-top: #f6df86;
       --theme-switch-day-bottom: #fff2c2;
@@ -232,6 +234,7 @@ skyshiftTemplate.innerHTML = `
           var(--theme-switch-day-ink) 34%, transparent);
       translate: 0 -50%;
       scale: 1;
+      transform-origin: left center;
       transition:
         translate 340ms cubic-bezier(.2, .85, .25, 1.08),
         scale 140ms cubic-bezier(.2, .8, .2, 1),
@@ -276,6 +279,7 @@ skyshiftTemplate.innerHTML = `
         inset 0 0 0 1px color-mix(in srgb,
           var(--theme-switch-moon-detail) 36%, transparent);
       translate: var(--theme-switch-travel) -50%;
+      transform-origin: right center;
     }
 
     input:checked + .track .knob::before {
@@ -288,7 +292,7 @@ skyshiftTemplate.innerHTML = `
     }
 
     input:active + .track .knob {
-      scale: .92;
+      scale: var(--theme-switch-press-stretch) var(--theme-switch-press-squash);
     }
 
     .moon {
@@ -389,6 +393,10 @@ skyshiftTemplate.innerHTML = `
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         transition: none !important;
+      }
+
+      input:active + .track .knob {
+        scale: 1;
       }
     }
   </style>
