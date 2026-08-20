@@ -317,7 +317,7 @@ skyshiftTemplate.innerHTML = `
     }
 
     .control.is-progressing input + .track::before {
-      opacity: 0;
+      opacity: var(--skyshift-night-overlay-opacity);
       transition: none;
     }
 
@@ -895,6 +895,10 @@ class SkyshiftToggle extends HTMLElement {
     set("--skyshift-moon-detail-opacity", moonDetail);
     set("--skyshift-moon-rotation", `${-18 * (1 - moonSurface)}deg`);
     set("--skyshift-moon-detail-scale", .92 + (.08 * moonSurface));
+    set(
+      "--skyshift-night-overlay-opacity",
+      skyshiftSmoothstep(.94, 1, value)
+    );
     set("--skyshift-track-inset", skyshiftColorMix(
       "rgba(70, 50, 10, .1)",
       "rgba(255, 255, 255, .1)",
@@ -995,6 +999,7 @@ class SkyshiftToggle extends HTMLElement {
       "--skyshift-moon-detail-opacity",
       "--skyshift-moon-rotation",
       "--skyshift-moon-detail-scale",
+      "--skyshift-night-overlay-opacity",
       "--skyshift-track-inset",
       "--skyshift-edge-top",
       "--skyshift-edge-bottom",
