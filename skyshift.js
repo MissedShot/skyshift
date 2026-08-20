@@ -30,8 +30,8 @@ skyshiftTemplate.innerHTML = `
         var(--theme-switch-border-width) -
         var(--theme-switch-border-width)
       );
-      --theme-switch-press-stretch: 1.14;
-      --theme-switch-press-squash: .95;
+      --theme-switch-press-stretch: 1.08;
+      --theme-switch-press-squash: .97;
 
       --theme-switch-day-top: #f6df86;
       --theme-switch-day-bottom: #fff2c2;
@@ -40,6 +40,13 @@ skyshiftTemplate.innerHTML = `
       --theme-switch-day-cloud-mid: #f4e8bd;
       --theme-switch-day-cloud-front: #fff7dc;
       --theme-switch-day-ink: #8c6c1e;
+
+      --theme-switch-sunset-top: #d89c6d;
+      --theme-switch-sunset-bottom: #f0cc8d;
+      --theme-switch-sunset-border: #c98a61;
+      --theme-switch-dusk-top: #745d94;
+      --theme-switch-dusk-bottom: #b96f8b;
+      --theme-switch-dusk-border: #765a8f;
 
       --theme-switch-sun-light: #f9d85a;
       --theme-switch-sun-mid: #f4c542;
@@ -301,14 +308,70 @@ skyshiftTemplate.innerHTML = `
       cursor: grabbing;
     }
 
-    .control.is-dragging .knob {
-      translate: var(--theme-switch-drag-x) -50%;
-      scale: var(--theme-switch-press-stretch) var(--theme-switch-press-squash);
+    .control.is-progressing input + .track {
+      box-shadow:
+        inset 0 1px 2px var(--skyshift-track-inset),
+        0 2px 4px rgba(0, 0, 0, .1),
+        0 6px 14px rgba(0, 0, 0, .14);
+      transition: none;
+    }
+
+    .control.is-progressing input + .track::before {
+      opacity: 0;
+      transition: none;
+    }
+
+    .control.is-progressing input + .track::after {
+      box-shadow:
+        inset 0 1px 0 var(--skyshift-edge-top),
+        inset 0 -1px 0 var(--skyshift-edge-bottom);
+      transition: none;
+    }
+
+    .control.is-progressing input + .track .day-scene {
+      opacity: var(--skyshift-day-opacity);
+      transform: translateX(var(--skyshift-day-x));
+      transition: none;
+    }
+
+    .control.is-progressing input + .track .night-scene {
+      opacity: var(--skyshift-night-opacity);
+      transform: translateX(var(--skyshift-night-x));
+      transition: none;
+    }
+
+    .control.is-progressing input + .track .night-scene .line-art,
+    .control.is-progressing input + .track .night-scene circle {
+      opacity: var(--skyshift-night-detail-opacity);
+    }
+
+    .control.is-progressing input + .track .knob {
+      translate: var(--skyshift-knob-x) -50%;
+      scale: var(--skyshift-knob-scale-x) var(--skyshift-knob-scale-y);
       transform-origin: center;
-      transition:
-        translate 70ms cubic-bezier(.2, .8, .2, 1),
-        scale 180ms cubic-bezier(.16, 1, .3, 1),
-        box-shadow 300ms ease;
+      box-shadow:
+        0 2px 10px var(--skyshift-knob-shadow),
+        inset 0 0 0 1px var(--skyshift-knob-inset);
+      transition: none;
+    }
+
+    .control.is-progressing input + .track .knob::before {
+      opacity: var(--skyshift-moon-surface-opacity);
+      transform: scale(var(--skyshift-moon-surface-scale));
+      transition: none;
+    }
+
+    .control.is-progressing input + .track .knob::after {
+      opacity: var(--skyshift-knob-highlight-opacity);
+      transition: none;
+    }
+
+    .control.is-progressing input + .track .moon {
+      opacity: var(--skyshift-moon-detail-opacity);
+      transform:
+        rotate(var(--skyshift-moon-rotation))
+        scale(var(--skyshift-moon-detail-scale));
+      transition: none;
     }
 
     .moon {
@@ -374,8 +437,8 @@ skyshiftTemplate.innerHTML = `
       input:checked + .track,
       .control:hover .track,
       .control:hover input:checked + .track {
-        border-color: CanvasText;
-        background: Canvas;
+        border-color: CanvasText !important;
+        background: Canvas !important;
         box-shadow: none;
         forced-color-adjust: none;
       }
@@ -393,8 +456,8 @@ skyshiftTemplate.innerHTML = `
 
       .knob,
       input:checked + .track .knob {
-        background: CanvasText;
-        box-shadow: none;
+        background: CanvasText !important;
+        box-shadow: none !important;
       }
 
       input:checked + .track .knob::before {
@@ -412,7 +475,7 @@ skyshiftTemplate.innerHTML = `
       }
 
       input:active + .track .knob,
-      .control.is-dragging .knob {
+      .control.is-progressing input + .track .knob {
         scale: 1;
       }
     }
@@ -452,6 +515,56 @@ skyshiftTemplate.innerHTML = `
   </label>
 `;
 
+const skyshiftClamp = (value, min = 0, max = 1) =>
+  Math.min(max, Math.max(min, value));
+
+const skyshiftSmoothstep = (start, end, value) => {
+  const progress = skyshiftClamp((value - start) / (end - start));
+  return progress * progress * (3 - (2 * progress));
+};
+
+const skyshiftColorMix = (from, to, amount) =>
+  `color-mix(in srgb, ${from} ${(1 - amount) * 100}%, ${to} ${amount * 100}%)`;
+
+const skyshiftPalette = [
+  [
+    0,
+    "var(--theme-switch-day-top)",
+    "var(--theme-switch-day-bottom)",
+    "var(--theme-switch-day-border)"
+  ],
+  [
+    .34,
+    "var(--theme-switch-sunset-top)",
+    "var(--theme-switch-sunset-bottom)",
+    "var(--theme-switch-sunset-border)"
+  ],
+  [
+    .62,
+    "var(--theme-switch-dusk-top)",
+    "var(--theme-switch-dusk-bottom)",
+    "var(--theme-switch-dusk-border)"
+  ],
+  [
+    1,
+    "var(--theme-switch-night-top)",
+    "var(--theme-switch-night-bottom)",
+    "var(--theme-switch-night-border)"
+  ]
+];
+
+const skyshiftPaletteAt = (progress) => {
+  const rightIndex = skyshiftPalette.findIndex(([point]) => point >= progress);
+  const right = skyshiftPalette[Math.max(1, rightIndex)];
+  const left = skyshiftPalette[Math.max(0, rightIndex - 1)];
+  const amount = skyshiftSmoothstep(left[0], right[0], progress);
+  return {
+    top: skyshiftColorMix(left[1], right[1], amount),
+    bottom: skyshiftColorMix(left[2], right[2], amount),
+    border: skyshiftColorMix(left[3], right[3], amount)
+  };
+};
+
 class SkyshiftToggle extends HTMLElement {
   static observedAttributes = ["theme", "label", "aria-label"];
 
@@ -469,30 +582,38 @@ class SkyshiftToggle extends HTMLElement {
     this._followsSystem = false;
     this._systemThemeQuery = null;
     this._drag = null;
+    this._visualProgress = null;
+    this._motionFrame = null;
+    this._motionGeneration = 0;
     this._suppressClick = false;
+    this._suppressClickTimer = null;
 
     this._handleChange = () => {
-      this._commitUserTheme(this._input.checked ? "dark" : "light");
+      this._transitionUserTheme(this._input.checked ? "dark" : "light");
     };
 
     this._handlePointerDown = (event) => {
       if (event.button !== 0 || event.isPrimary === false || this._drag) return;
+
+      this._clearClickSuppression();
+      this._cancelSettle({ clear: false });
 
       const travel = this._dragTravel();
       if (travel <= 0) return;
 
       const renderedWidth = this._track.getBoundingClientRect().width;
       const layoutWidth = this._track.offsetWidth;
+      const startProgress = this._visualProgress ?? (this.theme === "dark" ? 1 : 0);
       this._drag = {
         pointerId: event.pointerId,
         startX: event.clientX,
-        startPosition: this._input.checked ? travel : 0,
-        position: this._input.checked ? travel : 0,
+        startPosition: startProgress * travel,
+        position: startProgress * travel,
+        progress: startProgress,
         travel,
         pixelScale: renderedWidth > 0 && layoutWidth > 0
           ? renderedWidth / layoutWidth
           : 1,
-        previewDark: this._input.checked,
         moved: false
       };
       this._input.setPointerCapture?.(event.pointerId);
@@ -506,14 +627,10 @@ class SkyshiftToggle extends HTMLElement {
       if (!drag.moved && Math.abs(delta) < 4) return;
 
       drag.moved = true;
-      drag.position = Math.min(drag.travel, Math.max(0, drag.startPosition + delta));
-      this._knob.style.setProperty("--theme-switch-drag-x", `${drag.position}px`);
+      drag.position = skyshiftClamp(drag.startPosition + delta, 0, drag.travel);
+      drag.progress = drag.position / drag.travel;
       this._control.classList.add("is-dragging");
-
-      const progress = drag.position / drag.travel;
-      if (!drag.previewDark && progress >= .56) drag.previewDark = true;
-      if (drag.previewDark && progress <= .44) drag.previewDark = false;
-      this._input.checked = drag.previewDark;
+      this._renderProgress(drag.progress, { held: true, travel: drag.travel });
       event.preventDefault();
     };
 
@@ -521,29 +638,52 @@ class SkyshiftToggle extends HTMLElement {
       const drag = this._drag;
       if (!drag || event.pointerId !== drag.pointerId) return;
 
-      if (drag.moved) {
-        event.preventDefault();
-        this._commitUserTheme(drag.position >= drag.travel / 2 ? "dark" : "light");
-        this._suppressClick = true;
-        window.setTimeout(() => {
-          this._suppressClick = false;
-        }, 0);
+      if (!drag.moved) {
+        this._releaseDrag();
+        return;
       }
 
-      this._finishDrag();
+      event.preventDefault();
+      const theme = drag.progress >= .5 ? "dark" : "light";
+      const progress = drag.progress;
+      const travel = drag.travel;
+      this._releaseDrag();
+      this._armClickSuppression();
+      this._commitUserTheme(theme);
+      this._settleProgress(
+        progress,
+        this.theme === "dark" ? 1 : 0,
+        travel
+      );
     };
 
     this._handlePointerCancel = (event) => {
+      const drag = this._drag;
+      if (!drag || event.pointerId !== drag.pointerId) return;
+
+      const progress = drag.moved
+        ? drag.progress
+        : (this.theme === "dark" ? 1 : 0);
+      const target = this.theme === "dark" ? 1 : 0;
+      const travel = drag.travel;
+      this._releaseDrag();
+      this._settleProgress(progress, target, travel);
+    };
+
+    this._handleLostPointerCapture = (event) => {
       if (!this._drag || event.pointerId !== this._drag.pointerId) return;
-      this._input.checked = this.theme === "dark";
-      this._finishDrag();
+      this._handlePointerCancel(event);
     };
 
     this._handleClick = (event) => {
       if (!this._suppressClick) return;
-      this._suppressClick = false;
       event.preventDefault();
+      this._clearClickSuppression();
       this._input.checked = this.theme === "dark";
+    };
+
+    this._handleKeyDown = () => {
+      this._clearClickSuppression();
     };
 
     this._handleSync = (event) => {
@@ -556,6 +696,7 @@ class SkyshiftToggle extends HTMLElement {
         detail.storageKey !== storageKey
       ) return;
 
+      this._cancelInteraction();
       this._stopFollowingSystem();
       this._setTheme(detail.theme, {
         notify: true,
@@ -576,6 +717,7 @@ class SkyshiftToggle extends HTMLElement {
       }
 
       if (event.newValue !== "light" && event.newValue !== "dark") return;
+      this._cancelInteraction();
       this._stopFollowingSystem();
       this._setTheme(event.newValue, {
         notify: true,
@@ -588,10 +730,12 @@ class SkyshiftToggle extends HTMLElement {
     this._handleSystemThemeChange = (event) => {
       if (!this._followsSystem) return;
       if (this._readStoredTheme()) {
+        this._cancelInteraction();
         this._stopFollowingSystem();
         return;
       }
 
+      this._cancelInteraction();
       this._setTheme(event.matches ? "dark" : "light", {
         notify: true,
         persist: false,
@@ -609,7 +753,9 @@ class SkyshiftToggle extends HTMLElement {
     this._input.addEventListener("pointermove", this._handlePointerMove);
     this._input.addEventListener("pointerup", this._handlePointerUp);
     this._input.addEventListener("pointercancel", this._handlePointerCancel);
+    this._input.addEventListener("lostpointercapture", this._handleLostPointerCapture);
     this._input.addEventListener("click", this._handleClick);
+    this._input.addEventListener("keydown", this._handleKeyDown);
     window.addEventListener("skyshift-theme-sync", this._handleSync);
     window.addEventListener("storage", this._handleStorage);
 
@@ -647,11 +793,13 @@ class SkyshiftToggle extends HTMLElement {
     this._input.removeEventListener("pointermove", this._handlePointerMove);
     this._input.removeEventListener("pointerup", this._handlePointerUp);
     this._input.removeEventListener("pointercancel", this._handlePointerCancel);
+    this._input.removeEventListener("lostpointercapture", this._handleLostPointerCapture);
     this._input.removeEventListener("click", this._handleClick);
+    this._input.removeEventListener("keydown", this._handleKeyDown);
     window.removeEventListener("skyshift-theme-sync", this._handleSync);
     window.removeEventListener("storage", this._handleStorage);
     this._systemThemeQuery?.removeEventListener("change", this._handleSystemThemeChange);
-    this._finishDrag();
+    this._cancelInteraction({ clearClick: true });
     this._connected = false;
   }
 
@@ -665,6 +813,7 @@ class SkyshiftToggle extends HTMLElement {
 
     if (name !== "theme" || this._reflecting || !this._connected) return;
     if (newValue === "light" || newValue === "dark") {
+      this._cancelInteraction();
       this._stopFollowingSystem();
       this._setTheme(newValue, {
         notify: true,
@@ -683,6 +832,7 @@ class SkyshiftToggle extends HTMLElement {
     if (value !== "light" && value !== "dark") {
       throw new TypeError('theme must be "light" or "dark"');
     }
+    this._cancelInteraction();
     this._stopFollowingSystem();
     this._setTheme(value, {
       notify: true,
@@ -696,6 +846,14 @@ class SkyshiftToggle extends HTMLElement {
     this.theme = this.theme === "dark" ? "light" : "dark";
   }
 
+  _transitionUserTheme(theme) {
+    const travel = this._dragTravel();
+    const start = this._visualProgress ?? (this.theme === "dark" ? 1 : 0);
+    this._renderProgress(start, { held: false, travel });
+    this._commitUserTheme(theme);
+    this._settleProgress(start, this.theme === "dark" ? 1 : 0, travel);
+  }
+
   _commitUserTheme(theme) {
     this._stopFollowingSystem();
     this._setTheme(theme, {
@@ -706,21 +864,198 @@ class SkyshiftToggle extends HTMLElement {
     });
   }
 
+  _renderProgress(progress, { held = false, travel = this._dragTravel() } = {}) {
+    const value = skyshiftClamp(progress);
+    const palette = skyshiftPaletteAt(value);
+    const atmosphere = skyshiftSmoothstep(.12, .88, value);
+    const dayOpacity = .84 * (1 - skyshiftSmoothstep(.18, .72, value));
+    const nightOpacity = .96 * skyshiftSmoothstep(.28, .84, value);
+    const nightDetailOpacity = skyshiftSmoothstep(.52, .88, value);
+    const moonSurface = skyshiftSmoothstep(.34, .74, value);
+    const moonDetail = skyshiftSmoothstep(.58, .88, value);
+    const middle = 4 * value * (1 - value);
+    const stretch = held ? .018 + (.017 * middle) : 0;
+    const set = (name, nextValue) => {
+      this._control.style.setProperty(name, String(nextValue));
+    };
+
+    this._visualProgress = value;
+    this._control.classList.add("is-progressing");
+    set("--skyshift-knob-x", `${travel * value}px`);
+    set("--skyshift-knob-scale-x", 1 + stretch);
+    set("--skyshift-knob-scale-y", 1 - (.7 * stretch));
+    set("--skyshift-day-opacity", dayOpacity);
+    set("--skyshift-night-opacity", nightOpacity);
+    set("--skyshift-night-detail-opacity", nightDetailOpacity);
+    set("--skyshift-day-x", `${-4 * value}px`);
+    set("--skyshift-night-x", `${6 * (1 - value)}px`);
+    set("--skyshift-moon-surface-opacity", moonSurface);
+    set("--skyshift-moon-surface-scale", .94 + (.06 * moonSurface));
+    set("--skyshift-knob-highlight-opacity", .72 - (.48 * moonSurface));
+    set("--skyshift-moon-detail-opacity", moonDetail);
+    set("--skyshift-moon-rotation", `${-18 * (1 - moonSurface)}deg`);
+    set("--skyshift-moon-detail-scale", .92 + (.08 * moonSurface));
+    set("--skyshift-track-inset", skyshiftColorMix(
+      "rgba(70, 50, 10, .1)",
+      "rgba(255, 255, 255, .1)",
+      atmosphere
+    ));
+    set("--skyshift-edge-top", skyshiftColorMix(
+      "rgba(255, 255, 255, .5)",
+      "rgba(255, 255, 255, .22)",
+      atmosphere
+    ));
+    set("--skyshift-edge-bottom", skyshiftColorMix(
+      "rgba(92, 68, 10, .08)",
+      "rgba(0, 22, 43, .2)",
+      atmosphere
+    ));
+    set("--skyshift-knob-shadow", skyshiftColorMix(
+      "rgba(180, 132, 12, .3)",
+      "rgba(5, 36, 68, .3)",
+      moonSurface
+    ));
+    set("--skyshift-knob-inset", skyshiftColorMix(
+      "color-mix(in srgb, var(--theme-switch-day-ink) 34%, transparent)",
+      "color-mix(in srgb, var(--theme-switch-moon-detail) 36%, transparent)",
+      moonSurface
+    ));
+
+    this._track.style.background =
+      `linear-gradient(135deg, ${palette.top}, ${palette.bottom})`;
+    this._track.style.borderColor = palette.border;
+  }
+
+  _settleProgress(start, target, travel = this._dragTravel()) {
+    this._cancelSettle({ clear: false });
+    const from = skyshiftClamp(start);
+    const to = skyshiftClamp(target);
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion || Math.abs(to - from) < .001) {
+      this._renderProgress(to, { held: false, travel });
+      this._clearProgress();
+      return;
+    }
+
+    const duration = 180 + (80 * Math.abs(to - from));
+    const generation = ++this._motionGeneration;
+    let startedAt = null;
+    const requestFrame = window.requestAnimationFrame?.bind(window) ||
+      ((callback) => window.setTimeout(() => callback(performance.now()), 16));
+
+    const step = (timestamp) => {
+      if (generation !== this._motionGeneration) return;
+      if (startedAt === null) startedAt = timestamp;
+      const elapsed = skyshiftClamp((timestamp - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - elapsed, 4);
+      this._renderProgress(from + ((to - from) * eased), {
+        held: false,
+        travel
+      });
+
+      if (elapsed < 1) {
+        this._motionFrame = requestFrame(step);
+        return;
+      }
+
+      this._motionFrame = null;
+      this._clearProgress();
+    };
+
+    this._motionFrame = requestFrame(step);
+  }
+
+  _cancelSettle({ clear = true } = {}) {
+    this._motionGeneration += 1;
+    if (this._motionFrame !== null) {
+      if (window.cancelAnimationFrame) {
+        window.cancelAnimationFrame(this._motionFrame);
+      } else {
+        window.clearTimeout(this._motionFrame);
+      }
+      this._motionFrame = null;
+    }
+    if (clear) this._clearProgress();
+  }
+
+  _clearProgress() {
+    const properties = [
+      "--skyshift-knob-x",
+      "--skyshift-knob-scale-x",
+      "--skyshift-knob-scale-y",
+      "--skyshift-day-opacity",
+      "--skyshift-night-opacity",
+      "--skyshift-night-detail-opacity",
+      "--skyshift-day-x",
+      "--skyshift-night-x",
+      "--skyshift-moon-surface-opacity",
+      "--skyshift-moon-surface-scale",
+      "--skyshift-knob-highlight-opacity",
+      "--skyshift-moon-detail-opacity",
+      "--skyshift-moon-rotation",
+      "--skyshift-moon-detail-scale",
+      "--skyshift-track-inset",
+      "--skyshift-edge-top",
+      "--skyshift-edge-bottom",
+      "--skyshift-knob-shadow",
+      "--skyshift-knob-inset"
+    ];
+
+    this._visualProgress = null;
+    this._control.classList.remove("is-progressing");
+    for (const property of properties) {
+      this._control.style.removeProperty(property);
+    }
+    this._track.style.removeProperty("background");
+    this._track.style.removeProperty("border-color");
+  }
+
   _dragTravel() {
+    const computedStyle = window.getComputedStyle?.(this);
+    const configured = computedStyle
+      ?.getPropertyValue("--theme-switch-travel")
+      .trim();
+    const explicitPixels = configured?.match(/^(-?\d+(?:\.\d+)?)px$/);
+    if (explicitPixels) return Math.max(0, Number(explicitPixels[1]));
+
     return Math.max(
       0,
       this._track.clientWidth - this._knob.offsetWidth - (2 * this._knob.offsetLeft)
     );
   }
 
-  _finishDrag() {
+  _releaseDrag() {
     const pointerId = this._drag?.pointerId;
     this._drag = null;
     this._control.classList.remove("is-dragging");
-    this._knob.style.removeProperty("--theme-switch-drag-x");
 
     if (pointerId !== undefined && this._input.hasPointerCapture?.(pointerId)) {
       this._input.releasePointerCapture(pointerId);
+    }
+  }
+
+  _cancelInteraction({ clearClick = false } = {}) {
+    this._releaseDrag();
+    this._cancelSettle();
+    if (clearClick) this._clearClickSuppression();
+    this._input.checked = this.theme === "dark";
+  }
+
+  _armClickSuppression() {
+    this._clearClickSuppression();
+    this._suppressClick = true;
+    this._suppressClickTimer = window.setTimeout(() => {
+      this._suppressClick = false;
+      this._suppressClickTimer = null;
+    }, 900);
+  }
+
+  _clearClickSuppression() {
+    this._suppressClick = false;
+    if (this._suppressClickTimer !== null) {
+      window.clearTimeout(this._suppressClickTimer);
+      this._suppressClickTimer = null;
     }
   }
 

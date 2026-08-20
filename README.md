@@ -10,7 +10,7 @@ Skyshift is an illustrated, dependency-free light and dark mode switch built as 
 - **Dependency-free:** no framework, icon package, stylesheet, or build step required.
 - **Style-safe:** Shadow DOM prevents website CSS from breaking the illustration.
 - **Accessible:** native checkbox semantics, keyboard interaction, a stable accessible name, focus visibility, and reduced-motion support.
-- **Responsive:** press for elastic feedback, or drag the sun and moon across the track to choose a theme directly.
+- **Responsive:** press for elastic feedback, or drag through sunset and dusk to choose a theme directly.
 - **Persistent:** remembers the selected theme using `localStorage`.
 - **Customizable:** exposes CSS variables for every important visual color.
 
@@ -25,6 +25,8 @@ Copy [`skyshift.js`](./skyshift.js) into your project and load it as a deferred 
 ```
 
 Skyshift sets `data-theme="light"` or `data-theme="dark"` on the `<html>` element and updates `color-scheme` automatically.
+
+While dragging, only the illustration previews the continuous day-to-night transition. The native switch state, page theme, storage, synchronization, and `themechange` event commit once when the gesture is released.
 
 Add the matching website styles:
 
@@ -154,12 +156,13 @@ Available variable groups:
 
 - Size and motion: `--theme-switch-width`, `--theme-switch-height`, `--theme-switch-knob-size`, `--theme-switch-inset`, `--theme-switch-border-width`, `--theme-switch-travel`, `--theme-switch-press-stretch`, `--theme-switch-press-squash`
 - Day: `--theme-switch-day-top`, `--theme-switch-day-bottom`, `--theme-switch-day-border`, cloud colors, and `--theme-switch-day-ink`
+- Sunset and dusk: the `--theme-switch-sunset-*` and `--theme-switch-dusk-*` color groups
 - Sun: `--theme-switch-sun-light`, `--theme-switch-sun-mid`, `--theme-switch-sun-edge`
 - Night: `--theme-switch-night-top`, `--theme-switch-night-bottom`, `--theme-switch-night-border`, cloud colors, and `--theme-switch-night-ink`
 - Moon: `--theme-switch-moon-light`, `--theme-switch-moon-mid`, `--theme-switch-moon-edge`, `--theme-switch-moon-detail`
 - Interaction: `--theme-switch-focus`, `--theme-switch-hover-ring`
 
-Knob travel is calculated automatically from the width, knob size, inset, and border width. Override `--theme-switch-travel` only when you want custom geometry.
+Knob travel is calculated automatically from the width, knob size, inset, and border width. Override `--theme-switch-travel` with a pixel value only when you want custom drag geometry.
 
 ## Framework examples
 
